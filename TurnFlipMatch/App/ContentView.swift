@@ -6,6 +6,8 @@ let handleCellWidth: CGFloat = 60
 let cellSpacing: CGFloat = 10
 let gridHandleSpacing: CGFloat = 20
 
+let mainGridWidth = cellWidth*2 + cellSpacing + gridHandleSpacing
+
 struct ContentView: View {
     @State var manager = GameManager()
 
@@ -18,6 +20,9 @@ struct ContentView: View {
                     manager.checkForVictory()
                 }
         }
+        .frame(width: mainGridWidth, height: mainGridWidth)
+        .border(Color.cyan)
+        .coordinateSpace(.named("mainGrid"))
         .onAppear {
             manager.randomiseMainGrid()
         }

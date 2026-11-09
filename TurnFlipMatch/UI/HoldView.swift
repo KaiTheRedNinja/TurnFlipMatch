@@ -10,7 +10,12 @@ import SwiftUI
 struct HoldView: View {
     @Binding var hold: Hold
 
+    @State var currentAngle: Angle = .zero
+    @State var storedAngle: Angle = .zero
+
     var body: some View {
+        let centerPoint = CGPoint(x: mainGridWidth/2, y: mainGridWidth/2)
+
         VStack(spacing: cellSpacing) {
             hold.oppositeCwColor.color
                 .frame(width: handleCellWidth, height: cellSpacing)
@@ -21,31 +26,91 @@ struct HoldView: View {
             hold.oppositeAcwColor.color
                 .frame(width: handleCellWidth, height: cellSpacing)
         }
+        .offset(x: cellWidth * 1.5 + cellSpacing + gridHandleSpacing)
+        .rotationEffect(currentAngle)
+        .onChange(of: hold.position.edge, initial: true) { _, newValue in
+            let currentEdge = EdgePosition.closest(toDegrees: -currentAngle.degrees)
+            if currentEdge != newValue {
+                // current edge and new value are different, we update the position
+                // TODO: animate?
+                currentAngle = .degrees(-newValue.degrees)
+                storedAngle = currentAngle
+            }
+        }
         .gesture(
-            DragGesture(minimumDistance: 0)
+            DragGesture(minimumDistance: 0, coordinateSpace: .named("mainGrid"))
+                .onChanged { value in
+                    let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
+                    let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
+                    print("r: \(currentPolar.magnitude), t: \(currentPolar.angle.degrees)")
+
+                    let difference = currentPolar.angle - startPolar.angle
+                    currentAngle = storedAngle - difference
+                }
                 .onEnded { value in
                     if value.translation.magnitude <= 10 {
                         // flip
                         hold.position.flipped = !hold.position.flipped
                         return
                     }
-
-                    // check clockwise and anticlockwise movement
-                    // note that it defaults to being on the right side, and the gesture rotates with the view.
-                    if value.translation.height > 0 {
-                        hold.position.edge = hold.position.edge.acwNext
-                    } else {
-                        hold.position.edge = hold.position.edge.cwNext
-                    }
+                    // animate to the closest position
+                    let newEdge = EdgePosition.closest(toDegrees: -currentAngle.degrees)
+                    currentAngle = .degrees(-newEdge.degrees)
+                    storedAngle = currentAngle
                 }
         )
-        .offset(x: cellWidth * 1.5 + cellSpacing + gridHandleSpacing)
-        .rotationEffect(.degrees(-hold.position.edge.degrees))
     }
 }
 
 extension CGSize {
     var magnitude: CGFloat {
         sqrt(width*width + height*height)
+    }
+}
+
+struct Polar {
+    var center: CGPoint
+    var magnitude: CGFloat
+    var angle: Angle
+
+    init(point: CGPoint, center: CGPoint = .zero) {
+        let magnitude = center.distanceTo(other: point)
+        let angleRad = center.angleRadTo(other: point)
+        self.magnitude = magnitude
+        self.angle = .radians(angleRad)
+        self.center = center
+    }
+}
+
+extension CGPoint {
+    /// Flips a point along the x-axis
+    func vflip() -> CGPoint {
+        .init(x: self.x, y: -self.y)
+    }
+
+    func distanceTo(other: CGPoint) -> CGFloat {
+        let dx = other.x - self.x
+        let dy = other.y - self.y
+        return sqrt(dx * dx + dy * dy)
+    }
+
+    func angleRadTo(other: CGPoint) -> CGFloat {
+        let dx = other.x - self.x
+        let dy = other.y - self.y
+        // calculate base angle, which will be between 0 and 180 degrees
+        let base: CGFloat = if dx == 0 {
+            .pi * 0.5
+        } else {
+            (atan(dy/dx) + .pi).truncatingRemainder(dividingBy: .pi)
+        }
+        // increase by 180 degrees if in 3rd and 4th quadrants (i.e. negative y)
+        return base + (dy >= 0 ? 0 : .pi)
+    }
+
+    init(polar: Polar) {
+        self.init(
+            x: polar.center.x + polar.magnitude * cos(polar.angle.radians),
+            y: polar.center.y + polar.magnitude * sin(polar.angle.radians)
+        )
     }
 }
