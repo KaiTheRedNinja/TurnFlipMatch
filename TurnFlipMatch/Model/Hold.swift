@@ -17,6 +17,20 @@ struct Hold: Identifiable {
 
     var currentCwColor: CellColor { position.flipped ? side2Colors.cwColor : side1Colors.cwColor }
     var currentAcwColor: CellColor { position.flipped ? side2Colors.acwColor : side1Colors.acwColor }
+
+    var oppositeCwColor: CellColor { position.flipped ? side1Colors.cwColor : side2Colors.cwColor }
+    var oppositeAcwColor: CellColor { position.flipped ? side1Colors.acwColor : side2Colors.acwColor }
+
+    static let hold1: Hold = .init(
+        side1Colors: .init(cwColor: .green, acwColor: .red),
+        side2Colors: .init(cwColor: .yellow, acwColor: .blue),
+        position: .init(edge: .left, flipped: false)
+    )
+    static let hold2: Hold = .init(
+        side1Colors: .init(cwColor: .yellow, acwColor: .red),
+        side2Colors: .init(cwColor: .green, acwColor: .blue),
+        position: .init(edge: .right, flipped: false)
+    )
 }
 
 struct HoldSideColors {
@@ -87,4 +101,15 @@ enum CellColor: String, CaseIterable, Identifiable {
         case .yellow: Color.yellow
         }
     }
+}
+
+enum Quadrant: Int, CaseIterable {
+    case topRight = 1
+    case topLeft = 2
+    case bottomLeft = 3
+    case bottomRight = 4
+}
+
+struct MainGrid {
+    var colors: [Quadrant: CellColor]
 }

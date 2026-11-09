@@ -17,4 +17,4 @@ The holds have four colours each, one on either side. Each side has a clockwise 
 |  1|  Red|  Green|  Blue|  Yellow|
 |  2|  Red|  Yellow|  Blue| Green |
 
-This arrangement (should?) make it possible for every possible arrangement of 4 colours arranged in a 2x2 grid (where at most one is empty) to be represented.
+This arrangement (should?) give quite a lot of possible layouts.
