@@ -7,20 +7,19 @@ let cellSpacing: CGFloat = 10
 let gridHandleSpacing: CGFloat = 20
 
 struct ContentView: View {
-    @State var hold1 = Hold.hold1
-    @State var hold2 = Hold.hold2
-    @State var mainGrid = MainGrid(colors: [
-        .topLeft : .red,
-        .topRight : .green,
-        .bottomLeft : .yellow,
-        .bottomRight : .blue
-    ])
+    @State var manager = GameManager()
 
     var body: some View {
-        HStack(spacing: gridHandleSpacing) {
-            HoldView(hold: $hold1)
-            MainGridView(mainGrid: mainGrid)
-            HoldView(hold: $hold2)
+        ZStack {
+            HoldView(hold: $manager.hold1)
+            HoldView(hold: $manager.hold2)
+            MainGridView(mainGrid: manager.mainGrid)
+                .onTapGesture {
+                    manager.randomiseMainGrid()
+                }
+        }
+        .onAppear {
+            manager.randomiseMainGrid()
         }
     }
 }

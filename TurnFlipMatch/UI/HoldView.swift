@@ -21,9 +21,14 @@ struct HoldView: View {
             hold.oppositeAcwColor.color
                 .frame(width: handleCellWidth, height: cellSpacing)
         }
+        .overlay {
+            Text("\(hold.position.edge)")
+        }
         .onTapGesture {
             hold.position.flipped = !hold.position.flipped
         }
+        .offset(x: cellWidth * 1.5 + cellSpacing + gridHandleSpacing)
+        .rotationEffect(.degrees(-hold.position.edge.degrees))
     }
 }
 

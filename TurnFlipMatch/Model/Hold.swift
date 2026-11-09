@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Hold: Identifiable {
+struct Hold: Identifiable, Equatable {
     var id: UUID = .init()
 
     var side1Colors: HoldSideColors
@@ -26,24 +26,46 @@ struct Hold: Identifiable {
         side2Colors: .init(cwColor: .yellow, acwColor: .blue),
         position: .init(edge: .left, flipped: false)
     )
+//    static let hold2: Hold = .init(
+//        side1Colors: .init(cwColor: .yellow, acwColor: .red),
+//        side2Colors: .init(cwColor: .green, acwColor: .blue),
+//        position: .init(edge: .right, flipped: false)
+//    )
     static let hold2: Hold = .init(
-        side1Colors: .init(cwColor: .yellow, acwColor: .red),
-        side2Colors: .init(cwColor: .green, acwColor: .blue),
+        side1Colors: .init(cwColor: .red, acwColor: .yellow),
+        side2Colors: .init(cwColor: .blue, acwColor: .green),
         position: .init(edge: .right, flipped: false)
     )
 }
 
-struct HoldSideColors {
+struct HoldSideColors: Equatable {
     var cwColor: CellColor
     var acwColor: CellColor
 }
 
-struct HoldPosition {
+struct HoldPosition: Equatable {
     var edge: EdgePosition
     var flipped: Bool // false = side 1, true = side 2
+
+    /// Which quadrants the CW and ACW colours take up in this position
+    /// ```
+    ///      ACW CW
+    ///  CW   TL TR  ACW
+    ///  ACW  BL BR  CW
+    ///       CW ACW
+    /// ```
+    ///
+    var quadrants: (acw: Quadrant, cw: Quadrant) {
+        switch self.edge {
+        case .top: (.topLeft, .topRight)
+        case .left: (.bottomLeft, .topLeft)
+        case .bottom: (.bottomRight, .bottomLeft)
+        case .right: (.topRight, .bottomRight)
+        }
+    }
 }
 
-enum EdgePosition {
+enum EdgePosition: String, Equatable, CaseIterable {
     case top
     case left
     case bottom
@@ -68,6 +90,16 @@ enum EdgePosition {
         }
     }
 
+    /// The angle that this edge represents, in degrees from positive x-axis
+    var degrees: CGFloat {
+        switch self {
+        case .top: 90
+        case .left: 180
+        case .bottom: 270
+        case .right: 0
+        }
+    }
+
     /// The edge position closest to the given angle from the positive x-axis, in degrees
     static func closest(toDegrees deg: CGFloat) -> EdgePosition {
         // make deg 0 to 360. This is probably one of the worst ways to do it, but eh it works
@@ -85,7 +117,7 @@ enum EdgePosition {
     }
 }
 
-enum CellColor: String, CaseIterable, Identifiable {
+enum CellColor: String, CaseIterable, Identifiable, Equatable {
     case red
     case green
     case blue
@@ -103,13 +135,15 @@ enum CellColor: String, CaseIterable, Identifiable {
     }
 }
 
-enum Quadrant: Int, CaseIterable {
+enum Quadrant: Int, CaseIterable, Equatable {
     case topRight = 1
     case topLeft = 2
     case bottomLeft = 3
     case bottomRight = 4
 }
 
-struct MainGrid {
+struct MainGrid: Equatable {
     var colors: [Quadrant: CellColor]
+
+    static let empty = MainGrid(colors: [:])
 }
