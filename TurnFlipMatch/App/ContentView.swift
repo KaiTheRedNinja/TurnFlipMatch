@@ -6,7 +6,7 @@ let handleCellWidth: CGFloat = 60
 let cellSpacing: CGFloat = 10
 let gridHandleSpacing: CGFloat = 20
 
-let mainGridWidth = cellWidth*2 + cellSpacing + gridHandleSpacing
+let mainGridWidth = cellWidth*2 + cellSpacing + gridHandleSpacing*2
 
 struct ContentView: View {
     @State var manager = GameManager()
