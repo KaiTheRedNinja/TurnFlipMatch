@@ -30,10 +30,20 @@ class GameManager {
             }
             // they are valid! Update the main grid and exit
             mainGrid = grid
-            hold1 = hold1Candidate
-            hold2 = hold2Candidate
+//            hold1 = hold1Candidate
+//            hold2 = hold2Candidate
             return
         }
+    }
+
+    /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed
+    func checkForVictory() {
+        guard gridFromHolds(hold1: hold1, hold2: hold2) == mainGrid else { return }
+
+        // victory!
+        // TODO: some sort of points sysetm
+        // TODO: some sort of celebration system
+        randomiseMainGrid()
     }
 
     /// Returns the grid produced by two holds, or `nil` if they do not produce a valid grid (overlapping cells are different, or the holds themselves take up the same position)

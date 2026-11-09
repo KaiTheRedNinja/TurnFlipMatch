@@ -15,7 +15,7 @@ struct ContentView: View {
             HoldView(hold: $manager.hold2)
             MainGridView(mainGrid: manager.mainGrid)
                 .onTapGesture {
-                    manager.randomiseMainGrid()
+                    manager.checkForVictory()
                 }
         }
         .onAppear {

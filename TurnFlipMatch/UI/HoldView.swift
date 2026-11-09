@@ -21,14 +21,31 @@ struct HoldView: View {
             hold.oppositeAcwColor.color
                 .frame(width: handleCellWidth, height: cellSpacing)
         }
-        .overlay {
-            Text("\(hold.position.edge)")
-        }
-        .onTapGesture {
-            hold.position.flipped = !hold.position.flipped
-        }
+        .gesture(
+            DragGesture(minimumDistance: 0)
+                .onEnded { value in
+                    if value.translation.magnitude <= 10 {
+                        // flip
+                        hold.position.flipped = !hold.position.flipped
+                        return
+                    }
+
+                    // check clockwise and anticlockwise movement
+                    // note that it defaults to being on the right side, and the gesture rotates with the view.
+                    if value.translation.height > 0 {
+                        hold.position.edge = hold.position.edge.acwNext
+                    } else {
+                        hold.position.edge = hold.position.edge.cwNext
+                    }
+                }
+        )
         .offset(x: cellWidth * 1.5 + cellSpacing + gridHandleSpacing)
         .rotationEffect(.degrees(-hold.position.edge.degrees))
     }
 }
 
+extension CGSize {
+    var magnitude: CGFloat {
+        sqrt(width*width + height*height)
+    }
+}
