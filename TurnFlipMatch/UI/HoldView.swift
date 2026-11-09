@@ -27,13 +27,13 @@ struct HoldView: View {
                 .frame(width: handleCellWidth, height: cellSpacing)
         }
         .offset(x: cellWidth * 1.5 + cellSpacing + gridHandleSpacing)
-        .rotationEffect(currentAngle)
+        .rotationEffect(-currentAngle)
         .onChange(of: hold.position.edge, initial: true) { _, newValue in
-            let currentEdge = EdgePosition.closest(toDegrees: -currentAngle.degrees)
+            let currentEdge = EdgePosition.closest(toDegrees: currentAngle.degrees)
             if currentEdge != newValue {
                 // current edge and new value are different, we update the position
                 // TODO: animate?
-                currentAngle = .degrees(-newValue.degrees)
+                currentAngle = .degrees(newValue.degrees)
                 storedAngle = currentAngle
             }
         }
@@ -42,10 +42,10 @@ struct HoldView: View {
                 .onChanged { value in
                     let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
                     let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
-                    print("r: \(currentPolar.magnitude), t: \(currentPolar.angle.degrees)")
-
                     let difference = currentPolar.angle - startPolar.angle
-                    currentAngle = storedAngle - difference
+
+                    print("angle: \(currentPolar.angle.degrees), difference: \(difference.degrees)")
+                    currentAngle = storedAngle + difference
                 }
                 .onEnded { value in
                     if value.translation.magnitude <= 10 {
@@ -54,8 +54,8 @@ struct HoldView: View {
                         return
                     }
                     // animate to the closest position
-                    let newEdge = EdgePosition.closest(toDegrees: -currentAngle.degrees)
-                    currentAngle = .degrees(-newEdge.degrees)
+                    let newEdge = EdgePosition.closest(toDegrees: currentAngle.degrees)
+                    currentAngle = .degrees(newEdge.degrees)
                     storedAngle = currentAngle
                 }
         )

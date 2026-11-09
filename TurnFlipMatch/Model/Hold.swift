@@ -102,8 +102,8 @@ enum EdgePosition: String, Equatable, CaseIterable {
 
     /// The edge position closest to the given angle from the positive x-axis, in degrees
     static func closest(toDegrees deg: CGFloat) -> EdgePosition {
-        // make deg 0 to 360. This is probably one of the worst ways to do it, but eh it works
-        let rationalised = acos(cos(deg * .pi/180)) * 180 / .pi
+        // make deg 0 to 360
+        let rationalised = deg.remainder(dividingBy: 360)
 
         if rationalised < 0 + 45 || rationalised >= 360 - 45 {
             return .right
@@ -146,4 +146,12 @@ struct MainGrid: Equatable {
     var colors: [Quadrant: CellColor]
 
     static let empty = MainGrid(colors: [:])
+}
+
+infix operator %%
+extension CGFloat {
+    func remainder(dividingBy rhs: CGFloat) -> CGFloat {
+        let mod = self.truncatingRemainder(dividingBy: rhs)
+        return mod >= 0 ? mod : mod + rhs
+    }
 }
