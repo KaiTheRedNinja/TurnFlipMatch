@@ -12,25 +12,35 @@ struct ContentView: View {
     @State var manager = GameManager()
 
     var body: some View {
-        ZStack {
-            HoldView(hold: $manager.hold1)
-            HoldView(hold: $manager.hold2)
-            MainGridView(grid: manager.mainGrid)
-                .onTapGesture {
-                    manager.checkForVictory()
-                }
-        }
-        .frame(width: mainGridWidth, height: mainGridWidth)
-        .border(Color.cyan)
-        .coordinateSpace(.named("mainGrid"))
-        .onAppear {
-            manager.stateChangePlaying()
-        }
-        .onChange(of: manager.hold1) { _, _ in
-            manager.checkForVictory()
-        }
-        .onChange(of: manager.hold2) { _, _ in
-            manager.checkForVictory()
+        VStack {
+            Text("\(manager.points) Points")
+                .font(.largeTitle)
+                .monospacedDigit()
+
+            Spacer()
+
+            ZStack {
+                HoldView(hold: $manager.hold1)
+                HoldView(hold: $manager.hold2)
+                MainGridView(grid: manager.mainGrid)
+                    .onTapGesture {
+                        manager.checkForVictory()
+                    }
+            }
+            .frame(width: mainGridWidth, height: mainGridWidth)
+            .border(Color.cyan)
+            .coordinateSpace(.named("mainGrid"))
+            .onAppear {
+                manager.stateChangePlaying()
+            }
+            .onChange(of: manager.hold1) { _, _ in
+                manager.checkForVictory()
+            }
+            .onChange(of: manager.hold2) { _, _ in
+                manager.checkForVictory()
+            }
+
+            Spacer()
         }
     }
 }

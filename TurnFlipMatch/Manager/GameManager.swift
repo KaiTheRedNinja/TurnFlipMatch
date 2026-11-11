@@ -20,6 +20,9 @@ class GameManager {
     /// The current play state
     var playState = PlayState.playing
 
+    /// The current number of points
+    var points = 0;
+
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
     var animation: Task<Void, Never>?
 
@@ -58,6 +61,7 @@ class GameManager {
     /// Changes the state to losing
     func stateChangeLose() {
         print("Game lost :(")
+        // TODO: end game?
         playState = .lost
         // play the lose animation
         animation?.cancel()
@@ -74,6 +78,7 @@ class GameManager {
     /// Changes the state to winning
     func stateChangeWin() {
         print("Game WON!!!")
+        points += 1
         playState = .celebration
         // play the lose animation
         animation?.cancel()
