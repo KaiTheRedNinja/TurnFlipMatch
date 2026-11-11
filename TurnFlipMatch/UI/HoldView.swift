@@ -47,14 +47,14 @@ struct HoldView: View {
             if currentEdge != newValue {
                 // current edge and new value are different, we update the position
                 // TODO: animate?
-                let newAngle = Angle.degrees(newValue.degrees)
-                manager.rotateHold(holdId, moveToAngle: newAngle)
-                storedAngle = newAngle
+                storedAngle = manager.rotateHold(holdId, moveToAngle: Angle.degrees(newValue.degrees))
             }
         }
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .named("mainGrid"))
                 .onChanged { value in
+                    manager.markHold(holdId, isHeld: true)
+
                     let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
                     let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
                     let difference = currentPolar.angle - startPolar.angle
@@ -67,18 +67,19 @@ struct HoldView: View {
 //                    }
 
                     withAnimation(.interactiveSpring) {
-                        manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
+                        _ = manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
                     }
                 }
                 .onEnded { value in
+                    defer { manager.markHold(holdId, isHeld: false) }
+
                     guard value.translation.magnitude >= 10 else {
                         // flip and align
                         manager.flipHold(holdId)
                         let newEdge = EdgePosition.closest(toDegrees: hold.angle.degrees)
                         let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: hold.angle)
                         withAnimation(.interactiveSpring) {
-                            manager.rotateHold(holdId, moveToAngle: newAngle)
-                            storedAngle = newAngle
+                            storedAngle = manager.rotateHold(holdId, moveToAngle: newAngle)
                         }
                         return
                     }
@@ -102,8 +103,7 @@ struct HoldView: View {
                     // animate to the chosen position
                     let newAngle = Angle.degrees(chosenEdge.degrees).nearestEquivalent(to: hold.angle)
                     withAnimation(.interactiveSpring) {
-                        manager.rotateHold(holdId, moveToAngle: newAngle)
-                        storedAngle = newAngle
+                        storedAngle = manager.rotateHold(holdId, moveToAngle: newAngle)
                     }
                 }
         )

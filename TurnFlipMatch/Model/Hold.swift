@@ -13,13 +13,22 @@ struct Hold: Identifiable, Equatable {
     var side1Colors: HoldSideColors
     var side2Colors: HoldSideColors
 
+    var isHeld: Bool = false
     var position: HoldPosition
     var angle: Angle
 
-    init(id: HoldID, side1Colors: HoldSideColors, side2Colors: HoldSideColors, position: HoldPosition, angle: Angle? = nil) {
+    init(
+        id: HoldID,
+        side1Colors: HoldSideColors,
+        side2Colors: HoldSideColors,
+        isHeld: Bool = false,
+        position: HoldPosition,
+        angle: Angle? = nil
+    ) {
         self.id = id
         self.side1Colors = side1Colors
         self.side2Colors = side2Colors
+        self.isHeld = isHeld
         self.position = position
         self.angle = angle ?? .degrees(position.edge.degrees)
     }
@@ -52,6 +61,13 @@ struct Hold: Identifiable, Equatable {
 enum HoldID: String {
     case one
     case two
+
+    var other: HoldID {
+        switch self {
+        case .one: .two
+        case .two: .one
+        }
+    }
 }
 
 struct HoldSideColors: Equatable {
