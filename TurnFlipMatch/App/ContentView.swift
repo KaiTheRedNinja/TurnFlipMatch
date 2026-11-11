@@ -20,8 +20,8 @@ struct ContentView: View {
             Spacer()
 
             ZStack {
-                HoldView(hold: $manager.hold1)
-                HoldView(hold: $manager.hold2)
+                HoldView(manager: manager, holdId: .one)
+                HoldView(manager: manager, holdId: .two)
                 MainGridView(grid: manager.mainGrid)
                     .onTapGesture {
                         manager.checkForVictory()
@@ -33,20 +33,9 @@ struct ContentView: View {
             .onAppear {
                 manager.stateChangePlaying()
             }
-            .onChange(of: manager.hold1) { _, _ in
-                holdChanged()
-            }
-            .onChange(of: manager.hold2) { _, _ in
-                holdChanged()
-            }
 
             Spacer()
         }
-    }
-
-    func holdChanged() {
-        manager.playHaptic()
-        manager.checkForVictory()
     }
 }
 

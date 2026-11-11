@@ -14,6 +14,21 @@ class GameManager {
     var hold1: Hold
     /// The second hold
     var hold2: Hold
+    /// Get and set a copy of the requested hold
+    subscript (holdId holdId: HoldID) -> Hold {
+        get {
+            switch holdId {
+            case .one: hold1
+            case .two: hold2
+            }
+        }
+        set {
+            switch holdId {
+            case .one: hold1 = newValue
+            case .two: hold2 = newValue
+            }
+        }
+    }
     /// The main grid that renders on the screen
     var mainGrid: RenderedGrid
     /// The main grid that is actually used for comparisons
@@ -40,6 +55,30 @@ class GameManager {
             print("Device does not support haptics")
             return
         }
+    }
+
+    /// Informs the game manager of the intention to move the hold to the given angle.
+    ///
+    /// Note that this does not guarantee that the hold will move to that angle, as holds are not allowed to move through each other.
+    func rotateHold(_ id: HoldID, moveToAngle newAngle: Angle) {
+        // TODO: check if the angle is valid. Each hold should not be allowed to move any closer than 80 degrees from the other.
+        self[holdId: id].angle = newAngle
+        let newEdge = EdgePosition.closest(toDegrees: newAngle.degrees)
+        if newEdge != self[holdId: id].position.edge {
+            self[holdId: id].position.edge = newEdge
+            // a hold was changed, trigger haptic and check for victory
+            playHaptic()
+            checkForVictory()
+        }
+    }
+
+    /// Informs the game manager of the intention to flip the hold.
+    ///
+    /// Unlike `rotateHold`, this will flip the hold no matter what.
+    func flipHold(_ id: HoldID) {
+        self[holdId: id].position.flipped.toggle()
+        playHaptic()
+        checkForVictory()
     }
 
     func playHaptic() {

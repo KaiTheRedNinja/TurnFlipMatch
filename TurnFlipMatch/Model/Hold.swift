@@ -8,12 +8,21 @@
 import SwiftUI
 
 struct Hold: Identifiable, Equatable {
-    var id: UUID = .init()
+    var id: HoldID
 
     var side1Colors: HoldSideColors
     var side2Colors: HoldSideColors
 
     var position: HoldPosition
+    var angle: Angle
+
+    init(id: HoldID, side1Colors: HoldSideColors, side2Colors: HoldSideColors, position: HoldPosition, angle: Angle? = nil) {
+        self.id = id
+        self.side1Colors = side1Colors
+        self.side2Colors = side2Colors
+        self.position = position
+        self.angle = angle ?? .degrees(position.edge.degrees)
+    }
 
     var currentCwColor: CellColor { position.flipped ? side2Colors.cwColor : side1Colors.cwColor }
     var currentAcwColor: CellColor { position.flipped ? side2Colors.acwColor : side1Colors.acwColor }
@@ -22,6 +31,7 @@ struct Hold: Identifiable, Equatable {
     var oppositeAcwColor: CellColor { position.flipped ? side1Colors.acwColor : side2Colors.acwColor }
 
     static let hold1: Hold = .init(
+        id: .one,
         side1Colors: .init(cwColor: .green, acwColor: .red),
         side2Colors: .init(cwColor: .yellow, acwColor: .blue),
         position: .init(edge: .left, flipped: false)
@@ -32,10 +42,16 @@ struct Hold: Identifiable, Equatable {
 //        position: .init(edge: .right, flipped: false)
 //    )
     static let hold2: Hold = .init(
+        id: .two,
         side1Colors: .init(cwColor: .red, acwColor: .yellow),
         side2Colors: .init(cwColor: .blue, acwColor: .green),
         position: .init(edge: .right, flipped: false)
     )
+}
+
+enum HoldID: String {
+    case one
+    case two
 }
 
 struct HoldSideColors: Equatable {

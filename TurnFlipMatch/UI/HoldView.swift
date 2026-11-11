@@ -8,14 +8,15 @@
 import SwiftUI
 
 struct HoldView: View {
-    @Binding var hold: Hold
+    @State var manager: GameManager
+    var holdId: HoldID
 
-    @State var currentAngle: Angle = .zero
     @State var storedAngle: Angle = .zero
 
     var body: some View {
         let centerPoint = CGPoint(x: mainGridWidth/2, y: mainGridWidth/2)
         let offsetDist = cellWidth + cellSpacing + gridHandleSpacing + handleCellWidth/2
+        let hold = manager[holdId: holdId]
 
         VStack(spacing: cellSpacing) {
             hold.oppositeCwColor.color
@@ -34,17 +35,21 @@ struct HoldView: View {
         // distance = l / cos((theta-pi/4 mod pi/2) - pi/4)
         .offset(
             x: offsetDist / cos(
-                (currentAngle.radians + .pi/4).posRemainder(dividingBy: .pi/2) - .pi/4
+                (hold.angle.radians + .pi/4).posRemainder(dividingBy: .pi/2) - .pi/4
             )
         )
-        .rotationEffect(-currentAngle)
-        .onChange(of: hold.position.edge, initial: true) { _, newValue in
-            let currentEdge = EdgePosition.closest(toDegrees: currentAngle.degrees)
+        .rotationEffect(-hold.angle)
+        .onAppear {
+            storedAngle = .degrees(hold.angle.degrees)
+        }
+        .onChange(of: hold.position.edge) { _, newValue in // update from external signals
+            let currentEdge = EdgePosition.closest(toDegrees: hold.angle.degrees)
             if currentEdge != newValue {
                 // current edge and new value are different, we update the position
                 // TODO: animate?
-                currentAngle = .degrees(newValue.degrees)
-                storedAngle = currentAngle
+                let newAngle = Angle.degrees(newValue.degrees)
+                manager.rotateHold(holdId, moveToAngle: newAngle)
+                storedAngle = newAngle
             }
         }
         .gesture(
@@ -55,21 +60,27 @@ struct HoldView: View {
                     let difference = currentPolar.angle - startPolar.angle
 
                     withAnimation(.interactiveSpring) {
-                        currentAngle = (storedAngle + difference).nearestEquivalent(to: currentAngle)
+                        manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
                     }
                 }
                 .onEnded { value in
+                    let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
+                    let projectedEndPolar = Polar(point: value.predictedEndLocation.vflip(), center: centerPoint.vflip())
+                    let difference = projectedEndPolar.angle - startPolar.angle
+                    // preserve inertia, calculate end based off of projected end position
+                    let projectedEndAngle = (storedAngle + difference).nearestEquivalent(to: hold.angle)
+
                     if value.translation.magnitude <= 10 {
                         // flip
-                        hold.position.flipped = !hold.position.flipped
+                        manager.flipHold(holdId)
                         return
                     }
                     // animate to the closest position
-                    let newEdge = EdgePosition.closest(toDegrees: currentAngle.degrees)
-                    hold.position.edge = newEdge
+                    let newEdge = EdgePosition.closest(toDegrees: projectedEndAngle.degrees)
+                    let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: hold.angle)
                     withAnimation(.interactiveSpring) {
-                        currentAngle = .degrees(newEdge.degrees).nearestEquivalent(to: currentAngle)
-                        storedAngle = currentAngle
+                        manager.rotateHold(holdId, moveToAngle: newAngle)
+                        storedAngle = newAngle
                     }
                 }
         )
