@@ -42,13 +42,11 @@ struct HoldView: View {
         .onAppear {
             storedAngle = .degrees(hold.angle.degrees)
         }
-        .onChange(of: hold.position.edge) { _, newValue in // update from external signals
-            let currentEdge = EdgePosition.closest(toDegrees: hold.angle.degrees)
-            if currentEdge != newValue {
-                // current edge and new value are different, we update the position
-                // TODO: animate?
-                storedAngle = manager.rotateHold(holdId, moveToAngle: Angle.degrees(newValue.degrees))
-            }
+        .onChange(of: hold.angle) { _, newValue in // update from external signals
+            // ignore external signals if we are holding
+            guard !hold.isHeld else { return }
+            // update the internal stored angle
+            storedAngle = hold.angle
         }
         .gesture(
             DragGesture(minimumDistance: 0, coordinateSpace: .named("mainGrid"))
@@ -58,13 +56,6 @@ struct HoldView: View {
                     let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
                     let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
                     let difference = currentPolar.angle - startPolar.angle
-
-                    // current polar must be more than the offset distance away
-                    // otherwise it will spin quite crazy
-//                    guard currentPolar.magnitude > offsetDist * 0.8 else {
-//                        print("Too close!")
-//                        return
-//                    }
 
                     withAnimation(.interactiveSpring) {
                         _ = manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
