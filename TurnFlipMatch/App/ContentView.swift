@@ -34,14 +34,19 @@ struct ContentView: View {
                 manager.stateChangePlaying()
             }
             .onChange(of: manager.hold1) { _, _ in
-                manager.checkForVictory()
+                holdChanged()
             }
             .onChange(of: manager.hold2) { _, _ in
-                manager.checkForVictory()
+                holdChanged()
             }
 
             Spacer()
         }
+    }
+
+    func holdChanged() {
+        manager.playHaptic()
+        manager.checkForVictory()
     }
 }
 

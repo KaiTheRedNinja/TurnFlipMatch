@@ -6,25 +6,46 @@
 //
 
 import SwiftUI
+import CoreHaptics
 
 @Observable
 class GameManager {
     /// The first hold
-    var hold1 = Hold.hold1
+    var hold1: Hold
     /// The second hold
-    var hold2 = Hold.hold2
+    var hold2: Hold
     /// The main grid that renders on the screen
-    var mainGrid = RenderedGrid.empty
+    var mainGrid: RenderedGrid
     /// The main grid that is actually used for comparisons
-    var referenceGrid = MainGrid.empty
+    var referenceGrid: MainGrid
     /// The current play state
-    var playState = PlayState.playing
+    var playState: PlayState = .playing
 
     /// The current number of points
-    var points = 0;
+    var points: Int = 0;
 
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
     var animation: Task<Void, Never>?
+
+    init() {
+        self.hold1 = .hold1
+        self.hold2 = .hold2
+        self.mainGrid = .empty
+        self.referenceGrid = .empty
+        self.playState = .playing
+        self.points = 0
+
+        // set up haptics
+        guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
+            print("Device does not support haptics")
+            return
+        }
+    }
+
+    func playHaptic() {
+        let generator = UIImpactFeedbackGenerator()
+        generator.impactOccurred(intensity: 1.0)
+    }
 
     /// Generates a random valid main grid
     func stateChangePlaying() {
