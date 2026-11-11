@@ -148,6 +148,13 @@ struct MainGrid: Equatable {
     static let empty = MainGrid(colors: [:])
 }
 
+struct RenderedGrid: Equatable {
+    var grid: MainGrid
+    var brightness: CGFloat = 0; // negative to reduce brightness, positive to increase it
+
+    static let empty = RenderedGrid(grid: .empty)
+}
+
 infix operator %%
 extension BinaryFloatingPoint {
     func posRemainder(dividingBy rhs: Self) -> Self {

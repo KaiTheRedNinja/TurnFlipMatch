@@ -9,9 +9,19 @@ import SwiftUI
 
 @Observable
 class GameManager {
+    /// The first hold
     var hold1 = Hold.hold1
+    /// The second hold
     var hold2 = Hold.hold2
-    var mainGrid = MainGrid.empty
+    /// The main grid that renders on the screen
+    var mainGrid = RenderedGrid.empty
+    /// The main grid that is actually used for comparisons
+    var referenceGrid = MainGrid.empty
+    /// The current play state
+    var playState = PlayState.playing
+
+    /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
+    var animation: Task<Void, Never>?
 
     /// Generates a random valid main grid
     func randomiseMainGrid() {
@@ -24,21 +34,55 @@ class GameManager {
             hold1Candidate.position = hold1Pos
             hold2Candidate.position = hold2Pos
             // check if they are valid, and not equal to the current main grid
-            guard let grid = gridFromHolds(hold1: hold1Candidate, hold2: hold2Candidate), grid != mainGrid else {
+            guard let grid = gridFromHolds(hold1: hold1Candidate, hold2: hold2Candidate), grid != referenceGrid else {
                 // holds not valid, try again
                 continue
             }
-            // they are valid! Update the main grid and exit
-            mainGrid = grid
+            // they are valid! Update the reference grid and exit
+            referenceGrid = grid
 //            hold1 = hold1Candidate
 //            hold2 = hold2Candidate
+            // send out the animation
+            animation = Task {
+                do {
+                    try await animatePlayingMainGrid()
+                } catch {
+                    print("Playing main grid animation interrupted")
+                }
+            }
             return
         }
     }
 
+    /// Animates the main grid during play
+    func animatePlayingMainGrid() async throws {
+        let currentGrid = referenceGrid // make sure we're still operating on the same grid
+        mainGrid.grid = referenceGrid
+        mainGrid.brightness = 0
+
+        func wait(_ time: Duration) async throws {
+            try await Task.sleep(for: time)
+            guard !Task.isCancelled, referenceGrid == currentGrid else { throw CancellationError() }
+        }
+
+        // wait 3s, because outside 3s is not rushing
+        try await wait(.seconds(3))
+        // start blinking, PD of 50% at 2Hz for 3s (six cycles)
+        for _ in 0..<6 {
+            // off for 0.25s
+            mainGrid.brightness = -0.5
+            try await wait(.milliseconds(250))
+            // on for 0.25s
+            mainGrid.brightness = 0
+            try await wait(.milliseconds(250))
+        }
+        // the game has been lost, change state
+        print("Game lost :(")
+    }
+
     /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed
     func checkForVictory() {
-        guard gridFromHolds(hold1: hold1, hold2: hold2) == mainGrid else { return }
+        guard gridFromHolds(hold1: hold1, hold2: hold2) == referenceGrid else { return }
 
         // victory!
         // TODO: some sort of points sysetm
@@ -68,4 +112,10 @@ class GameManager {
         }
         return grid
     }
+}
+
+enum PlayState {
+    case playing
+    case celebration
+    case lost
 }

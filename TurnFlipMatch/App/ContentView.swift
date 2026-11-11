@@ -15,7 +15,7 @@ struct ContentView: View {
         ZStack {
             HoldView(hold: $manager.hold1)
             HoldView(hold: $manager.hold2)
-            MainGridView(mainGrid: manager.mainGrid)
+            MainGridView(grid: manager.mainGrid)
                 .onTapGesture {
                     manager.checkForVictory()
                 }

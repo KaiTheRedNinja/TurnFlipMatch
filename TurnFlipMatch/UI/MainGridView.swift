@@ -8,22 +8,23 @@
 import SwiftUI
 
 struct MainGridView: View {
-    var mainGrid: MainGrid
+    var grid: RenderedGrid
 
     var body: some View {
         VStack(spacing: cellSpacing) {
             HStack(spacing: cellSpacing) {
-                (mainGrid.colors[.topLeft]?.color ?? Color.clear)
+                (grid.grid.colors[.topLeft]?.color ?? Color.clear)
                     .frame(width: cellWidth, height: cellWidth)
-                (mainGrid.colors[.topRight]?.color ?? Color.clear)
+                (grid.grid.colors[.topRight]?.color ?? Color.clear)
                     .frame(width: cellWidth, height: cellWidth)
             }
             HStack(spacing: cellSpacing) {
-                (mainGrid.colors[.bottomLeft]?.color ?? Color.clear)
+                (grid.grid.colors[.bottomLeft]?.color ?? Color.clear)
                     .frame(width: cellWidth, height: cellWidth)
-                (mainGrid.colors[.bottomRight]?.color ?? Color.clear)
+                (grid.grid.colors[.bottomRight]?.color ?? Color.clear)
                     .frame(width: cellWidth, height: cellWidth)
             }
         }
+        .brightness(grid.brightness)
     }
 }
