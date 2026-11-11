@@ -145,6 +145,19 @@ enum Quadrant: Int, CaseIterable, Equatable {
 struct MainGrid: Equatable {
     var colors: [Quadrant: CellColor]
 
+    init(colors: [Quadrant : CellColor]) {
+        self.colors = colors
+    }
+
+    init(color: CellColor?) {
+        self.colors = [
+            .topLeft: color,
+            .topRight: color,
+            .bottomLeft: color,
+            .bottomRight: color
+        ].compactMapValues { $0 }
+    }
+
     static let empty = MainGrid(colors: [:])
 }
 

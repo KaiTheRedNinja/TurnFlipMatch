@@ -26,6 +26,12 @@ struct ContentView: View {
         .onAppear {
             manager.randomiseMainGrid()
         }
+        .onChange(of: manager.hold1) { _, _ in
+            manager.checkForVictory()
+        }
+        .onChange(of: manager.hold2) { _, _ in
+            manager.checkForVictory()
+        }
     }
 }
 

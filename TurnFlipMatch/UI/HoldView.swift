@@ -27,6 +27,9 @@ struct HoldView: View {
             hold.oppositeAcwColor.color
                 .frame(width: handleCellWidth, height: cellSpacing)
         }
+        .overlay {
+            Text("\(hold.position.edge.rawValue)")
+        }
         // equation for a square with side lengths 2r:
         // distance = l / cos((theta-pi/4 mod pi/2) - pi/4)
         .offset(
@@ -63,6 +66,7 @@ struct HoldView: View {
                     }
                     // animate to the closest position
                     let newEdge = EdgePosition.closest(toDegrees: currentAngle.degrees)
+                    hold.position.edge = newEdge
                     withAnimation(.interactiveSpring) {
                         currentAngle = .degrees(newEdge.degrees).nearestEquivalent(to: currentAngle)
                         storedAngle = currentAngle

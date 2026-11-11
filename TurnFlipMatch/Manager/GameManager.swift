@@ -25,6 +25,7 @@ class GameManager {
 
     /// Generates a random valid main grid
     func randomiseMainGrid() {
+        playState = .playing
         while true {
             // generate two random hold positions
             let hold1Pos = HoldPosition(edge: .allCases.randomElement()!, flipped: .random())
@@ -76,8 +77,71 @@ class GameManager {
             mainGrid.brightness = 0
             try await wait(.milliseconds(250))
         }
-        // the game has been lost, change state
-        print("Game lost :(")
+//        // the game has been lost, change state
+//        print("Game lost :(")
+//        didLose()
+    }
+
+    /// Changes the state to losing
+    func didLose() {
+        playState = .lost
+        // play the lose animation
+        animation?.cancel()
+        animation = Task {
+            // main grid becomes fully red for 0.5s
+            mainGrid = .init(grid: .init(color: .red))
+            do {
+                try await Task.sleep(for: .milliseconds(500))
+                guard !Task.isCancelled else { throw CancellationError() }
+
+                // TODO: determine if we want to auto-restart?
+                randomiseMainGrid()
+            } catch {
+                print("Playing lost grid animation interrupted")
+                return
+            }
+        }
+    }
+
+    /// Changes the state to winning
+    func didWin() {
+        print("Game WON!!!")
+        playState = .celebration
+        // play the lose animation
+        animation?.cancel()
+        animation = Task {
+            func wait(_ time: Duration) async throws {
+                try await Task.sleep(for: time)
+                guard !Task.isCancelled else { throw CancellationError() }
+            }
+
+            do {
+                // every 0.1s we mark another square green
+                mainGrid.grid.colors[.topLeft] = .green
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.topRight] = .green
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.bottomRight] = .green
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.bottomLeft] = .green
+
+                // every 0.1s we wipe the screen, in the same order
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.topLeft] = nil
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.topRight] = nil
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.bottomRight] = nil
+                try await wait(.milliseconds(100))
+                mainGrid.grid.colors[.bottomLeft] = nil
+
+                // TODO: determine if we want to auto-restart?
+                randomiseMainGrid()
+            } catch {
+                print("Playing win grid animation interrupted")
+                return
+            }
+        }
     }
 
     /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed
@@ -87,7 +151,8 @@ class GameManager {
         // victory!
         // TODO: some sort of points sysetm
         // TODO: some sort of celebration system
-        randomiseMainGrid()
+//        randomiseMainGrid()
+        didWin()
     }
 
     /// Returns the grid produced by two holds, or `nil` if they do not produce a valid grid (overlapping cells are different, or the holds themselves take up the same position)
