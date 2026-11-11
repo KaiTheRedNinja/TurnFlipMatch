@@ -66,6 +66,34 @@ extension Angle {
         let rounds = ((reference.radians - self.radians)/(2 * .pi)).rounded()
         return self + .radians(2.0 * .pi * rounds)
     }
+
+    /// Wraps this angle between -pi and +pi
+    func wrap() -> Angle {
+        let twoPi = 2.0 * Double.pi
+        return .radians(((self.radians + Double.pi)
+            .truncatingRemainder(dividingBy: twoPi) + twoPi)
+            .truncatingRemainder(dividingBy: twoPi) - Double.pi
+        )
+    }
+
+    /// Determines if this angle lies between the arc defined by two other angles, where the arc is less than 180 degrees
+    func isBetween(
+        _ theta0: Angle,
+        _ theta1: Angle
+    ) -> Bool {
+        let d = (theta1 - theta0).wrap()
+        let p = (self - theta0).wrap()
+
+        guard abs(d.radians) < Double.pi else {
+            return false
+        }
+
+        if d >= .zero {
+            return p >= .zero && p <= d
+        } else {
+            return p <= .zero && p >= d
+        }
+    }
 }
 
 infix operator %%

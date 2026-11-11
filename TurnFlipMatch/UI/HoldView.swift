@@ -92,9 +92,8 @@ struct HoldView: View {
                     }
 
                     // animate to the chosen position
-                    let newAngle = Angle.degrees(chosenEdge.degrees).nearestEquivalent(to: hold.angle)
                     withAnimation(.interactiveSpring) {
-                        storedAngle = manager.rotateHold(holdId, moveToAngle: newAngle)
+                        storedAngle = manager.moveHold(holdId, moveToEdge: chosenEdge)
                     }
                 }
         )
