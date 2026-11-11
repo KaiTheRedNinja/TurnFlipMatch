@@ -106,6 +106,10 @@ enum EdgePosition: String, Equatable, CaseIterable {
         }
     }
 
+    func isNextTo(_ other: EdgePosition) -> Bool {
+        other == cwNext || other == acwNext
+    }
+
     /// The angle that this edge represents, in degrees from positive x-axis
     var degrees: CGFloat {
         switch self {

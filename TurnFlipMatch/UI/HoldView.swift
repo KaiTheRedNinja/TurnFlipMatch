@@ -59,25 +59,48 @@ struct HoldView: View {
                     let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
                     let difference = currentPolar.angle - startPolar.angle
 
+                    // current polar must be more than the offset distance away
+                    // otherwise it will spin quite crazy
+//                    guard currentPolar.magnitude > offsetDist * 0.8 else {
+//                        print("Too close!")
+//                        return
+//                    }
+
                     withAnimation(.interactiveSpring) {
                         manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
                     }
                 }
                 .onEnded { value in
+                    guard value.translation.magnitude >= 10 else {
+                        // flip and align
+                        manager.flipHold(holdId)
+                        let newEdge = EdgePosition.closest(toDegrees: hold.angle.degrees)
+                        let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: hold.angle)
+                        withAnimation(.interactiveSpring) {
+                            manager.rotateHold(holdId, moveToAngle: newAngle)
+                            storedAngle = newAngle
+                        }
+                        return
+                    }
+
                     let startPolar = Polar(point: value.startLocation.vflip(), center: centerPoint.vflip())
                     let projectedEndPolar = Polar(point: value.predictedEndLocation.vflip(), center: centerPoint.vflip())
                     let difference = projectedEndPolar.angle - startPolar.angle
                     // preserve inertia, calculate end based off of projected end position
                     let projectedEndAngle = (storedAngle + difference).nearestEquivalent(to: hold.angle)
+                    let projectedEndEdge = EdgePosition.closest(toDegrees: projectedEndAngle.degrees)
 
-                    if value.translation.magnitude <= 10 {
-                        // flip
-                        manager.flipHold(holdId)
-                        return
+                    // if the projected end angle is too close to the center (magnitude too small) or it results in skipping by
+                    // more than one edge (e.g. back to front), we just use the current position
+                    let chosenEdge: EdgePosition = if projectedEndPolar.magnitude > offsetDist * 0.8, projectedEndEdge.isNextTo(hold.position.edge) {
+                        projectedEndEdge
+                    } else {
+                        // if not, then we just stick to where we are
+                        hold.position.edge
                     }
-                    // animate to the closest position
-                    let newEdge = EdgePosition.closest(toDegrees: projectedEndAngle.degrees)
-                    let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: hold.angle)
+
+                    // animate to the chosen position
+                    let newAngle = Angle.degrees(chosenEdge.degrees).nearestEquivalent(to: hold.angle)
                     withAnimation(.interactiveSpring) {
                         manager.rotateHold(holdId, moveToAngle: newAngle)
                         storedAngle = newAngle

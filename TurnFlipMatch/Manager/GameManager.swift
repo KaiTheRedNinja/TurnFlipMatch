@@ -155,12 +155,18 @@ class GameManager {
     /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed
     func checkForVictory() {
         guard gridFromHolds(hold1: hold1, hold2: hold2) == referenceGrid else { return }
+        _ = Task {
+            do {
+                try await Task.sleep(for: .milliseconds(200))
+            } catch {
+                print("Could not wait for victory")
+            }
 
-        // victory!
-        // TODO: some sort of points sysetm
-        // TODO: some sort of celebration system
-//        randomiseMainGrid()
-        stateChangeWin()
+            // check again if we're still winning
+            guard gridFromHolds(hold1: hold1, hold2: hold2) == referenceGrid else { return }
+            // if so, we won!
+            stateChangeWin()
+        }
     }
 
     /// Returns the grid produced by two holds, or `nil` if they do not produce a valid grid (overlapping cells are different, or the holds themselves take up the same position)
