@@ -24,7 +24,7 @@ struct ContentView: View {
         .border(Color.cyan)
         .coordinateSpace(.named("mainGrid"))
         .onAppear {
-            manager.randomiseMainGrid()
+            manager.stateChangePlaying()
         }
         .onChange(of: manager.hold1) { _, _ in
             manager.checkForVictory()

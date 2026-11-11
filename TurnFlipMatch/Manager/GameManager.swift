@@ -24,7 +24,7 @@ class GameManager {
     var animation: Task<Void, Never>?
 
     /// Generates a random valid main grid
-    func randomiseMainGrid() {
+    func stateChangePlaying() {
         playState = .playing
         while true {
             // generate two random hold positions
@@ -55,47 +55,15 @@ class GameManager {
         }
     }
 
-    /// Animates the main grid during play
-    func animatePlayingMainGrid() async throws {
-        let currentGrid = referenceGrid // make sure we're still operating on the same grid
-        mainGrid.grid = referenceGrid
-        mainGrid.brightness = 0
-
-        func wait(_ time: Duration) async throws {
-            try await Task.sleep(for: time)
-            guard !Task.isCancelled, referenceGrid == currentGrid else { throw CancellationError() }
-        }
-
-        // wait 3s, because outside 3s is not rushing
-        try await wait(.seconds(3))
-        // start blinking, PD of 50% at 2Hz for 3s (six cycles)
-        for _ in 0..<6 {
-            // off for 0.25s
-            mainGrid.brightness = -0.5
-            try await wait(.milliseconds(250))
-            // on for 0.25s
-            mainGrid.brightness = 0
-            try await wait(.milliseconds(250))
-        }
-//        // the game has been lost, change state
-//        print("Game lost :(")
-//        didLose()
-    }
-
     /// Changes the state to losing
-    func didLose() {
+    func stateChangeLose() {
+        print("Game lost :(")
         playState = .lost
         // play the lose animation
         animation?.cancel()
         animation = Task {
-            // main grid becomes fully red for 0.5s
-            mainGrid = .init(grid: .init(color: .red))
             do {
-                try await Task.sleep(for: .milliseconds(500))
-                guard !Task.isCancelled else { throw CancellationError() }
-
-                // TODO: determine if we want to auto-restart?
-                randomiseMainGrid()
+                try await animateLostMainGrid()
             } catch {
                 print("Playing lost grid animation interrupted")
                 return
@@ -104,39 +72,14 @@ class GameManager {
     }
 
     /// Changes the state to winning
-    func didWin() {
+    func stateChangeWin() {
         print("Game WON!!!")
         playState = .celebration
         // play the lose animation
         animation?.cancel()
         animation = Task {
-            func wait(_ time: Duration) async throws {
-                try await Task.sleep(for: time)
-                guard !Task.isCancelled else { throw CancellationError() }
-            }
-
             do {
-                // every 0.1s we mark another square green
-                mainGrid.grid.colors[.topLeft] = .green
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.topRight] = .green
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.bottomRight] = .green
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.bottomLeft] = .green
-
-                // every 0.1s we wipe the screen, in the same order
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.topLeft] = nil
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.topRight] = nil
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.bottomRight] = nil
-                try await wait(.milliseconds(100))
-                mainGrid.grid.colors[.bottomLeft] = nil
-
-                // TODO: determine if we want to auto-restart?
-                randomiseMainGrid()
+                try await animateWinMainGrid()
             } catch {
                 print("Playing win grid animation interrupted")
                 return
@@ -152,7 +95,7 @@ class GameManager {
         // TODO: some sort of points sysetm
         // TODO: some sort of celebration system
 //        randomiseMainGrid()
-        didWin()
+        stateChangeWin()
     }
 
     /// Returns the grid produced by two holds, or `nil` if they do not produce a valid grid (overlapping cells are different, or the holds themselves take up the same position)
