@@ -13,23 +13,33 @@ struct HoldView: View {
 
     @State var storedAngle: Angle = .zero
 
+    /// `0` for not flipped, `pi` for flipped
+    @State var flipAngle: Angle = .zero
+
     var body: some View {
         let centerPoint = CGPoint(x: mainGridWidth/2, y: mainGridWidth/2)
-        let offsetDist = cellWidth + cellSpacing + gridHandleSpacing + handleCellWidth/2
+        let offsetDist = cellWidth + cellSpacing + gridHandleSpacing + handleCellWidth/2 + 10
         let hold = manager[holdId: holdId]
 
-        VStack(spacing: cellSpacing) {
-            hold.oppositeCwColor.color
-                .frame(width: handleCellWidth, height: cellSpacing)
-            hold.currentAcwColor.color
-                .frame(width: handleCellWidth, height: cellWidth)
-            hold.currentCwColor.color
-                .frame(width: handleCellWidth, height: cellWidth)
-            hold.oppositeAcwColor.color
-                .frame(width: handleCellWidth, height: cellSpacing)
+        ZStack {
+//            if flipAngle < .degrees(90) {
+            sideColors(hold: hold, isSide1: !hold.position.flipped)
+                .rotation3DEffect(flipAngle, axis: (x: 1, y: 0, z: 0))
+                .scaleEffect(y: hold.position.flipped ? 1 : -1)
+//            } else {
+//                sideColors(hold: hold, isSide1: false)
+//                    .rotation3DEffect(flipAngle + .degrees(180), axis: (x: 0, y: 1, z: 0))
+//            }
+        }
+        .animation(.easeIn(duration: 0.2), value: hold.position.flipped)
+        .onChange(of: hold.position.flipped, initial: true) { _, newValue in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                flipAngle = newValue ? .zero : .degrees(180)
+            }
         }
         .overlay {
-            Text("\(hold.position.edge.rawValue)")
+            Text(hold.position.flipped ? "flipped": "regular")
+                .foregroundStyle(.cyan)
         }
         // equation for a square with side lengths 2r:
         // distance = l / cos((theta-pi/4 mod pi/2) - pi/4)
@@ -97,5 +107,29 @@ struct HoldView: View {
                     }
                 }
         )
+    }
+
+    func sideColors(hold: Hold, isSide1: Bool) -> some View {
+        VStack(spacing: cellSpacing) {
+            hold.colorFor(side1: !isSide1, isClockwise: true).color
+                .frame(width: handleCellWidth * 0.8, height: cellSpacing)
+                .clipShape(UnevenRoundedRectangle(cornerRadii: .init(bottomLeading: 10, bottomTrailing: 10)))
+
+            hold.colorFor(side1: isSide1, isClockwise: false).color
+                .frame(width: handleCellWidth, height: cellWidth)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+            hold.colorFor(side1: isSide1, isClockwise: true).color
+                .frame(width: handleCellWidth, height: cellWidth)
+                .clipShape(RoundedRectangle(cornerRadius: 10))
+
+            hold.colorFor(side1: !isSide1, isClockwise: false).color
+                .frame(width: handleCellWidth * 0.8, height: cellSpacing)
+                .clipShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 10, topTrailing: 10)))
+        }
+        .padding(.horizontal, 10)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.primary)
+        }
     }
 }

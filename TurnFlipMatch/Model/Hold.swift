@@ -39,6 +39,21 @@ struct Hold: Identifiable, Equatable {
     var oppositeCwColor: CellColor { position.flipped ? side1Colors.cwColor : side2Colors.cwColor }
     var oppositeAcwColor: CellColor { position.flipped ? side1Colors.acwColor : side2Colors.acwColor }
 
+    func colorFor(side1: Bool, isClockwise: Bool) -> CellColor {
+        switch side1 {
+        case true:
+            switch isClockwise {
+            case true: side1Colors.cwColor
+            case false: side1Colors.acwColor
+            }
+        case false:
+            switch isClockwise {
+            case true: side2Colors.cwColor
+            case false: side2Colors.acwColor
+            }
+        }
+    }
+
     static let hold1: Hold = .init(
         id: .one,
         side1Colors: .init(cwColor: .green, acwColor: .red),
