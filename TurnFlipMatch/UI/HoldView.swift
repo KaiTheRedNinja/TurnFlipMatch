@@ -22,24 +22,15 @@ struct HoldView: View {
         let hold = manager[holdId: holdId]
 
         ZStack {
-//            if flipAngle < .degrees(90) {
             sideColors(hold: hold, isSide1: !hold.position.flipped)
                 .rotation3DEffect(flipAngle, axis: (x: 1, y: 0, z: 0))
-                .scaleEffect(y: hold.position.flipped ? 1 : -1)
-//            } else {
-//                sideColors(hold: hold, isSide1: false)
-//                    .rotation3DEffect(flipAngle + .degrees(180), axis: (x: 0, y: 1, z: 0))
-//            }
+                .scaleEffect(y: hold.position.flipped ? -1 : 1)
         }
         .animation(.easeIn(duration: 0.2), value: hold.position.flipped)
         .onChange(of: hold.position.flipped, initial: true) { _, newValue in
             withAnimation(.easeInOut(duration: 0.2)) {
-                flipAngle = newValue ? .zero : .degrees(180)
+                flipAngle = newValue ? .degrees(180) : .degrees(0)
             }
-        }
-        .overlay {
-            Text(hold.position.flipped ? "flipped": "regular")
-                .foregroundStyle(.cyan)
         }
         // equation for a square with side lengths 2r:
         // distance = l / cos((theta-pi/4 mod pi/2) - pi/4)
