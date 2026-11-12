@@ -13,18 +13,27 @@ struct MainGridView: View {
     var body: some View {
         VStack(spacing: cellSpacing) {
             HStack(spacing: cellSpacing) {
-                (grid.grid.colors[.topLeft]?.color ?? Color.clear)
+                (grid.grid.colors[.topLeft]?.color ?? Color.gray.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: cellWidth, height: cellWidth)
-                (grid.grid.colors[.topRight]?.color ?? Color.clear)
+                (grid.grid.colors[.topRight]?.color ?? Color.gray.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: cellWidth, height: cellWidth)
             }
             HStack(spacing: cellSpacing) {
-                (grid.grid.colors[.bottomLeft]?.color ?? Color.clear)
+                (grid.grid.colors[.bottomLeft]?.color ?? Color.gray.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: cellWidth, height: cellWidth)
-                (grid.grid.colors[.bottomRight]?.color ?? Color.clear)
+                (grid.grid.colors[.bottomRight]?.color ?? Color.gray.opacity(0.8))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(width: cellWidth, height: cellWidth)
             }
         }
         .brightness(grid.brightness)
+        .padding(cellSpacing)
+        .background {
+            RoundedRectangle(cornerRadius: 10)
+                .fill(Color.primary)
+        }
     }
 }
