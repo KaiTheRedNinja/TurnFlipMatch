@@ -8,6 +8,10 @@
 import SwiftUI
 import CoreHaptics
 
+let startingTimeSec: CGFloat = 8.0
+let endingTimeSec: CGFloat = 3.0
+let maxPhases: CGFloat = 10.0
+
 @Observable
 class GameManager {
     /// The first hold
@@ -42,7 +46,7 @@ class GameManager {
     var phase: Int = 1
 
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
-    var animation: Task<Void, Never>?
+    private(set) var animation: Task<Void, Never>?
 
     init() {
         self.hold1 = .hold1
@@ -65,6 +69,20 @@ class GameManager {
     func playHaptic() {
         let generator = UIImpactFeedbackGenerator()
         generator.impactOccurred(intensity: 1.0)
+    }
+
+    func playAnimation<E: Error>(name: String, task: @escaping () async throws(E) -> Void) {
+        print("Playing \(name) animation")
+        animation?.cancel()
+        animation = Task {
+            do {
+                try await task()
+                print("Ended \(name) animation")
+            } catch {
+                print("Stopped \(name) animation: interrupted due to \(error.localizedDescription)")
+                return
+            }
+        }
     }
 }
 

@@ -25,7 +25,6 @@ extension GameManager {
         let otherHold = self[holdId: id.other]
         let otherAngleClose = otherHold.angle.nearestEquivalent(to: newAngle)
         let difference = newAngle - otherAngleClose // how many degrees clockwise this hold is relative to the other
-        print("Difference: \(difference.degrees)")
         if abs(difference.degrees) < angleThreshold {
             // if the other hold is not being held down, we move it
             if !otherHold.isHeld {
@@ -77,7 +76,6 @@ extension GameManager {
         let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: thisHold.angle)
         let otherAngleClose = otherHold.angle.nearestEquivalent(to: newAngle)
         let difference = newAngle - otherAngleClose // how many degrees clockwise this hold is relative to the other
-        print("Difference: \(difference.degrees)")
         if abs(difference.degrees) < angleThreshold {
             // the other hold is being held down, so we just stick to the current edge
             print("Can't overlap!")

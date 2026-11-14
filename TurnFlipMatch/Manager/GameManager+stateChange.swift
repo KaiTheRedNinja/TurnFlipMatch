@@ -9,6 +9,7 @@ extension GameManager {
     /// If the current state is `.idle`, it changes to `.playing`. Does nothing otherwise.
     func exitIdleState() {
         if playState == .idle {
+            points = -1 // state change win will make this 0 points
             // note: we actually enter the win state just so that we have a screen-clearing animation
             stateChangeWin()
         }
@@ -17,7 +18,7 @@ extension GameManager {
     /// Enters the idle state
     func stateChangeIdle() {
         playState = .idle
-        // TODO: idle animation
+        playAnimation(name: "Idle", task: animateIdleMainGrid)
     }
 
     /// Generates a random valid main grid
@@ -41,13 +42,7 @@ extension GameManager {
             //            hold1 = hold1Candidate
             //            hold2 = hold2Candidate
             // send out the animation
-            animation = Task {
-                do {
-                    try await animatePlayingMainGrid()
-                } catch {
-                    print("Playing main grid animation interrupted")
-                }
-            }
+            playAnimation(name: "Playing", task: animatePlayingMainGrid)
             return
         }
     }
@@ -58,15 +53,7 @@ extension GameManager {
         // TODO: end game?
         playState = .lost
         // play the lose animation
-        animation?.cancel()
-        animation = Task {
-            do {
-                try await animateLostMainGrid()
-            } catch {
-                print("Playing lost grid animation interrupted")
-                return
-            }
-        }
+        playAnimation(name: "Lose", task: animateLostMainGrid)
     }
 
     /// Changes the state to winning
@@ -74,21 +61,13 @@ extension GameManager {
         print("Game WON!!!")
         points += 1
         playState = .celebration
-        // play the lose animation
-        animation?.cancel()
-        animation = Task {
-            do {
-                try await animateWinMainGrid()
-            } catch {
-                print("Playing win grid animation interrupted")
-                return
-            }
-        }
+        // play the win animation
+        playAnimation(name: "Win", task: animateWinMainGrid)
     }
 
     /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed
     func checkForVictory() {
-        guard gridFromHolds(hold1: hold1, hold2: hold2) == referenceGrid else { return }
+        guard playState == .playing, gridFromHolds(hold1: hold1, hold2: hold2) == referenceGrid else { return }
         _ = Task {
             do {
                 try await Task.sleep(for: .milliseconds(200))
