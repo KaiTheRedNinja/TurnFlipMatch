@@ -12,12 +12,25 @@ struct ContentView: View {
     @State var manager = GameManager()
 
     var body: some View {
-        VStack {
-            Text("\(manager.points) Points")
-                .font(.largeTitle)
-                .monospacedDigit()
+        ZStack(alignment: .center) {
+            Color.clear
 
-            Spacer()
+            VStack(spacing: 20) {
+                Spacer()
+                    .frame(height: 20)
+
+                Text("\(manager.points) Points")
+                    .font(.largeTitle)
+                    .monospacedDigit()
+
+                if manager.playState == .idle {
+                    Text("Move a hold to start")
+                        .font(.title)
+                        .italic()
+                }
+
+                Spacer()
+            }
 
             ZStack {
                 HoldView(manager: manager, holdId: .one)
@@ -30,11 +43,6 @@ struct ContentView: View {
             .shadow(radius: 10)
             .frame(width: mainGridWidth, height: mainGridWidth)
             .coordinateSpace(.named("mainGrid"))
-            .onAppear {
-                manager.stateChangePlaying()
-            }
-
-            Spacer()
         }
     }
 }

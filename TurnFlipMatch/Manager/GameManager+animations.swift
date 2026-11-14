@@ -19,10 +19,16 @@ extension GameManager {
             guard !Task.isCancelled, referenceGrid == currentGrid else { throw CancellationError() }
         }
 
+        // at the start, the user will have 10s.
+        // this will decrease to 3s starting at phase 11
+        // the very last 2 seconds will have flashing, four flashes = game over
+        let totalSeconds: CGFloat = 10.0 - 0.7 * CGFloat(phase - 1)/10.0
+        let nonRushSeconds: CGFloat = totalSeconds - 2
+
         // wait 3s, because outside 3s is not rushing
-        try await wait(.seconds(3))
-        // start blinking, PD of 50% at 2Hz for 3s (six cycles)
-        for _ in 0..<6 {
+        try await wait(.milliseconds(Int(nonRushSeconds * 1000)))
+        // start blinking, PD of 50% at 2Hz for 2s (four cycles)
+        for _ in 0..<4 {
             // off for 0.25s
             mainGrid.brightness = .allOff
             try await wait(.milliseconds(250))
@@ -30,9 +36,9 @@ extension GameManager {
             mainGrid.brightness = .allHigh
             try await wait(.milliseconds(250))
         }
-        //        // the game has been lost, change state
-        //        print("Game lost :(")
-        //        didLose()
+        // the game has been lost, change state
+        print("Game lost :(")
+        stateChangeLose()
     }
 
     /// Changes the state to losing
@@ -43,8 +49,7 @@ extension GameManager {
         try await Task.sleep(for: .milliseconds(500))
         guard !Task.isCancelled else { throw CancellationError() }
 
-        // TODO: determine if we want to auto-restart?
-        stateChangePlaying()
+        stateChangeIdle()
     }
 
     /// Changes the state to winning
@@ -75,7 +80,7 @@ extension GameManager {
         mainGrid.color.cells[.bottomLeft] = nil
 
         // if the number of points means we're in a new phase, change it
-        let newPhase = (points/5) + 1
+        let newPhase = (points/10) + 1
         if newPhase > phase {
             // do a phase change before switching to playing
             phase = newPhase

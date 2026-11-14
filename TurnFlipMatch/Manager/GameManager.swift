@@ -34,11 +34,11 @@ class GameManager {
     /// The main grid that is actually used for comparisons
     var referenceGrid: ColorGrid
     /// The current play state
-    var playState: PlayState = .playing
+    var playState: PlayState = .idle
 
     /// The current number of points
     var points: Int = 0
-    /// The current phase. This is equal to `floor(points/5)+1`, and controls the speed of the game.
+    /// The current phase. This is equal to `floor(points/10)+1`, and controls the speed of the game.
     var phase: Int = 1
 
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
@@ -49,7 +49,7 @@ class GameManager {
         self.hold2 = .hold2
         self.mainGrid = .empty
         self.referenceGrid = .empty
-        self.playState = .playing
+        self.playState = .idle
         self.points = 0
 
         // set up haptics
@@ -57,6 +57,9 @@ class GameManager {
             print("Device does not support haptics")
             return
         }
+
+        // enter idle state
+        stateChangeIdle()
     }
 
     func playHaptic() {
@@ -65,10 +68,25 @@ class GameManager {
     }
 }
 
+/// The states that the game can be in.
+///
+/// ```
+///   ╭----- lost
+///   ↓        ↑
+/// idle -→ playing -→ celebration -→ phaseChange
+///            ↑            |              |
+///            ╰------------╯←-------------╯
+/// ```
 enum PlayState {
+    /// The game is not running
+    case idle
+    /// The user must match the tiles to the current main grid
     case playing
+    /// The user has just successfully matched a grid, play a celebration animation
     case celebration
-    // every 5 wins, the phase changes. Each phase change reduces the time by 10%.
+    /// The user has just successfully matched a grid 10 times, play a phase change animation.
+    /// Each phase change reduces the time, starting at 10s all the way down to 3.
     case phaseChange
+    /// The user failed to match the holds within the given time. Play a lose animation.
     case lost
 }

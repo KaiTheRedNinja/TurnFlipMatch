@@ -6,6 +6,20 @@
 //
 
 extension GameManager {
+    /// If the current state is `.idle`, it changes to `.playing`. Does nothing otherwise.
+    func exitIdleState() {
+        if playState == .idle {
+            // note: we actually enter the win state just so that we have a screen-clearing animation
+            stateChangeWin()
+        }
+    }
+
+    /// Enters the idle state
+    func stateChangeIdle() {
+        playState = .idle
+        // TODO: idle animation
+    }
+
     /// Generates a random valid main grid
     func stateChangePlaying() {
         playState = .playing

@@ -57,6 +57,7 @@ extension GameManager {
         if newEdge != thisHold.position.edge {
             self[holdId: id].position.edge = newEdge
             // a hold was changed, trigger haptic and check for victory
+            exitIdleState()
             playHaptic()
             checkForVictory()
         }
@@ -96,6 +97,7 @@ extension GameManager {
         if newEdge != thisHold.position.edge {
             self[holdId: id].position.edge = newEdge
             // a hold was changed, trigger haptic and check for victory
+            exitIdleState()
             playHaptic()
             checkForVictory()
         }
@@ -107,6 +109,7 @@ extension GameManager {
     /// Unlike `rotateHold`, this will flip the hold no matter what.
     func flipHold(_ id: HoldID) {
         self[holdId: id].position.flipped.toggle()
+        exitIdleState()
         playHaptic()
         checkForVictory()
     }
