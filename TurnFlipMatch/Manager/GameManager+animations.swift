@@ -102,7 +102,7 @@ extension GameManager {
 
         // if the number of points means we're in a new phase, change it
         let newPhase = (points/10) + 1
-        if newPhase > phase {
+        if newPhase > phase && phase >= 0 { // NOTE: if phase is negative, we don't change it - it was intentionally set that way
             // do a phase change before switching to playing
             phase = newPhase
             try await animatePhaseChangeMainGrid(phase: newPhase)

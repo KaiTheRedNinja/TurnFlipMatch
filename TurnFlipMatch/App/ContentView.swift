@@ -52,30 +52,33 @@ struct ContentView: View {
         Text("Tutorial")
             .font(.largeTitle)
 
-        Text(tutorial.instructions)
-            .minimumScaleFactor(0.5)
-            .font(.body)
-            .italic()
+        VStack(spacing: 20) {
+            Text(tutorial.instructions)
+                .minimumScaleFactor(0.5)
+                .font(.body)
+                .italic()
 
-        Spacer()
-            .frame(minHeight: totalMaxWidth)
-
-        HStack {
-            if tutorial.phase != .ready {
-                Button("Exit") {
-                    tutorial.exit()
-                }
-                .buttonStyle(.bordered)
-            }
             Spacer()
-            Button("Next") {
-                tutorial.nextPhase()
+                .frame(minHeight: totalMaxWidth)
+
+            HStack {
+                if tutorial.phase != .ready {
+                    Button("Exit") {
+                        tutorial.exit()
+                    }
+                    .buttonStyle(.bordered)
+                }
+                Spacer()
+                Button("Next") {
+                    tutorial.nextPhase()
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(tutorial.tracker?.isComplete() == false)
             }
-            .buttonStyle(.borderedProminent)
-            .disabled(tutorial.tracker?.isComplete() == false)
+            // NOTE: there are 5 phases, from 0 to 4, so we add 1
+            ProgressView(value: CGFloat(tutorial.phase.rawValue + 1), total: 5)
         }
-        // NOTE: there are 5 phases, from 0 to 4, so we add 1
-        ProgressView(value: CGFloat(tutorial.phase.rawValue + 1), total: 5)
+        .padding(.horizontal, 30)
     }
 
     @ViewBuilder

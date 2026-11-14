@@ -174,7 +174,7 @@ class TutorialManager: GameManagerDelegate {
         gameManager.stateChangePlaying(gridOverride: grid)
 
         // update the instructions
-        instructions = "Drag a hold to move it"
+        instructions = "Drag the right hold to move it"
     }
 
     /// Generates a grid that has to be solved by just rotating two holds.
@@ -183,12 +183,11 @@ class TutorialManager: GameManagerDelegate {
         // the holds should be hold1 = left flipped, hold2 = top normal
         // manually set the game
         var hold1Candidate = Hold.hold1
-        hold1Candidate.position.flipped = false
+        hold1Candidate.position.flipped = true
         hold1Candidate.position.edge = .bottom
         var hold2Candidate = Hold.hold2
-        hold1Candidate.position.flipped = true
+        hold2Candidate.position.flipped = true
         hold2Candidate.position.edge = .right
-        // TODO: test this arrangement, idk if this will actually work
         let grid = gameManager.gridFromHolds(hold1: hold1Candidate, hold2: hold2Candidate)
         gameManager.stateChangePlaying(gridOverride: grid)
 
@@ -237,26 +236,43 @@ class TutorialManager: GameManagerDelegate {
             }
         }
     }
-    func userDidEnterPlaying() { /* intentionally left empty */ }
+    func userDidEnterPlaying() {
+        // if the user entered playing when they have already succeeded, we enter idle instead
+        guard tracker?.isComplete() == true else { return }
+        gameManager.stateChangeIdleNoAnimation()
+        gameManager.referenceGrid = .init(all: .green)
+        gameManager.mainGrid.color = gameManager.referenceGrid
+    }
     func userDidEnterCelebration() {
         update(tracker: &tracker, as: TutorialFlipTracker.self) { flipTracker in
             flipTracker.gameWon = true
+        }
+        update(tracker: &tracker, as: TutorialRotateTracker.self) { rotateTracker in
+            rotateTracker.gameWon = true
+        }
+        update(tracker: &tracker, as: TutorialTwoAtOnceTracker.self) { twoTracker in
+            twoTracker.gameWon = true
         }
         update(tracker: &tracker, as: TutorialMatchTracker.self) { matchTracker in
             matchTracker.gameWon = true
         }
     }
-    func userDidEnterLost() {
-        // If the user loses, we force it back into playing with the same grid.
-        guard let gameManager else { return }
-        gameManager.stateChangePlaying(gridOverride: gameManager.referenceGrid)
+    func userDidEnterLost() { /* intentionally left empty - everything handled in getGridOverride and userDidEnterPlaying */ }
+    func userDidEnterIdle() {
+        // if the user entered idle without having completed the task, we immediately boot back into playing
+        if tracker?.isComplete() != true {
+            gameManager.stateChangePlaying(gridOverride: gameManager.referenceGrid)
+        }
     }
-    func userDidEnterIdle() { /* intentionally left empty - it is not possible to enter idle via losing, so it must have been on purpose */ }
-    func getGridOverride() -> ColorGrid? { nil }
+    func getGridOverride() -> ColorGrid? {
+        // The only time we want to actually have a random map is during match phase. Else, we just use the current grid.
+        if phase == .match { return nil }
+        return gameManager.referenceGrid
+    }
 }
 
 fileprivate func update<Tracker: TutorialTracker>(tracker: inout (any TutorialTracker)?, as: Tracker.Type, operation: (inout Tracker) -> Void) {
-    var value = (tracker as? Tracker) ?? .init()
+    guard var value = tracker as? Tracker else { return }
     operation(&value)
     tracker = value
 }

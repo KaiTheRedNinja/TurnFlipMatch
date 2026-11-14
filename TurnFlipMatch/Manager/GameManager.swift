@@ -87,6 +87,11 @@ class GameManager {
             }
         }
     }
+
+    func stopAnimation() {
+        animation?.cancel()
+        animation = nil
+    }
 }
 
 /// The states that the game can be in.

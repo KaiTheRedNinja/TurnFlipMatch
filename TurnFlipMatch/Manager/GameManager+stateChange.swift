@@ -22,6 +22,13 @@ extension GameManager {
         delegate?.userDidEnterIdle()
     }
 
+    /// Enters the idle state, but without playing the idle animation
+    func stateChangeIdleNoAnimation() {
+        playState = .idle
+        stopAnimation()
+        delegate?.userDidEnterIdle()
+    }
+
     /// Switches the current state to playing. If no grid was provided, this randomly generates a grid.
     func stateChangePlaying(gridOverride: ColorGrid? = nil) {
         playState = .playing
