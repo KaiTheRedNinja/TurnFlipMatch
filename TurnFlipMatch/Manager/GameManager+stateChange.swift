@@ -22,10 +22,13 @@ extension GameManager {
         delegate?.userDidEnterIdle()
     }
 
-    /// Generates a random valid main grid
-    func stateChangePlaying() {
+    /// Switches the current state to playing. If no grid was provided, this randomly generates a grid.
+    func stateChangePlaying(gridOverride: ColorGrid? = nil) {
         playState = .playing
-        while true {
+        defer { delegate?.userDidEnterPlaying() }
+
+        var grid: ColorGrid? = gridOverride ?? delegate?.getGridOverride()
+        while grid == nil {
             // generate two random hold positions
             let hold1Pos = HoldPosition(edge: .allCases.randomElement()!, flipped: .random())
             let hold2Pos = HoldPosition(edge: .allCases.randomElement()!, flipped: .random())
@@ -34,19 +37,17 @@ extension GameManager {
             hold1Candidate.position = hold1Pos
             hold2Candidate.position = hold2Pos
             // check if they are valid, and not equal to the current main grid
-            guard let grid = gridFromHolds(hold1: hold1Candidate, hold2: hold2Candidate), grid != referenceGrid else {
+            guard let gridCandidate = gridFromHolds(hold1: hold1Candidate, hold2: hold2Candidate), gridCandidate != referenceGrid else {
                 // holds not valid, try again
                 continue
             }
-            // they are valid! Update the reference grid and exit
-            referenceGrid = grid
-            //            hold1 = hold1Candidate
-            //            hold2 = hold2Candidate
-            // send out the animation
-            playAnimation(name: "Playing", task: animatePlayingMainGrid)
-            return
+            grid = gridCandidate
         }
-        delegate?.userDidEnterPlaying()
+
+        // Update the reference grid and exit
+        referenceGrid = grid!
+        // send out the animation
+        playAnimation(name: "Playing", task: animatePlayingMainGrid)
     }
 
     /// Changes the state to losing

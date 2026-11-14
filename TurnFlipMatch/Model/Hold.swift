@@ -136,6 +136,10 @@ enum EdgePosition: String, Equatable, CaseIterable {
         case .right: .bottom
         }
     }
+    /// A set containing `cwNext` and `acwNext`
+    var adjacent: Set<EdgePosition> {
+        [cwNext, acwNext]
+    }
 
     func isNextTo(_ other: EdgePosition) -> Bool {
         other == cwNext || other == acwNext

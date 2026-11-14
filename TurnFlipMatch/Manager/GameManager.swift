@@ -130,6 +130,11 @@ protocol GameManagerDelegate: AnyObject {
     func userDidEnterLost()
     /// Informs the delegate that the game has returned to idle state
     func userDidEnterIdle()
+
+    /// Requests an override to the grid. If `nil` is returned, it will randomly generate a grid.
+    ///
+    /// If the `gridOverride` parameter of `stateChangePlaying` is specified, that value will be used instead and this function will not be called.
+    func getGridOverride() -> ColorGrid?
 }
 
 /// Default implementations
@@ -142,4 +147,5 @@ extension GameManagerDelegate {
     func userDidEnterCelebration() {}
     func userDidEnterLost() {}
     func userDidEnterIdle() {}
+    func getGridOverride() -> ColorGrid? { nil }
 }
