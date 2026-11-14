@@ -30,6 +30,16 @@ struct ContentView: View {
                 }
 
                 Spacer()
+
+                if manager.playState == .idle {
+                    Button("Tutorial") {
+                        // TODO: activate tutorial
+                    }
+                    .buttonStyle(.borderedProminent)
+                }
+
+                Spacer()
+                    .frame(height: 20)
             }
 
             ZStack {
