@@ -38,7 +38,7 @@ extension GameManager {
     /// Changes the state to losing
     func animateLostMainGrid() async throws {
         // main grid becomes fully red for 0.5s
-        mainGrid = .init(grid: .init(color: .red))
+        mainGrid = .init(grid: .init(all: .red))
 
         try await Task.sleep(for: .milliseconds(500))
         guard !Task.isCancelled else { throw CancellationError() }
@@ -56,23 +56,23 @@ extension GameManager {
         mainGrid.brightness = 0
 
         // every 0.1s we mark another square green
-        mainGrid.grid.colors[.topLeft] = .green
+        mainGrid.grid.cells[.topLeft] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.topRight] = .green
+        mainGrid.grid.cells[.topRight] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.bottomRight] = .green
+        mainGrid.grid.cells[.bottomRight] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.bottomLeft] = .green
+        mainGrid.grid.cells[.bottomLeft] = .green
 
         // every 0.1s we wipe the screen, in the same order
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.topLeft] = nil
+        mainGrid.grid.cells[.topLeft] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.topRight] = nil
+        mainGrid.grid.cells[.topRight] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.bottomRight] = nil
+        mainGrid.grid.cells[.bottomRight] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.colors[.bottomLeft] = nil
+        mainGrid.grid.cells[.bottomLeft] = nil
 
         // if the number of points means we're in a new phase, change it
         let newPhase = (points/5) + 1
@@ -94,7 +94,7 @@ extension GameManager {
         }
 
         // make all green
-        mainGrid = .init(grid: .init(color: .green))
+        mainGrid = .init(grid: .init(all: .green))
 
         for _ in 0..<phase {
             // turn off

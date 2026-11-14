@@ -7,27 +7,37 @@
 
 import Foundation
 
-struct MainGrid: Equatable {
-    var colors: [Quadrant: CellColor]
+struct QuadrantGrid<Cell: Equatable>: Equatable {
+    var cells: [Quadrant: Cell]
 
-    init(colors: [Quadrant : CellColor]) {
-        self.colors = colors
+    init(cells: [Quadrant: Cell]) {
+        self.cells = cells
     }
 
-    init(color: CellColor?) {
-        self.colors = [
-            .topLeft: color,
-            .topRight: color,
-            .bottomLeft: color,
-            .bottomRight: color
+    init(all: Cell?) {
+        self.cells = [
+            .topLeft: all,
+            .topRight: all,
+            .bottomLeft: all,
+            .bottomRight: all
         ].compactMapValues { $0 }
     }
+}
 
-    static let empty = MainGrid(colors: [:])
+typealias ColorGrid = QuadrantGrid<CellColor>
+
+extension ColorGrid {
+    static let empty = ColorGrid(cells: [:])
+}
+
+typealias BrightnessGrid = QuadrantGrid<CellBrightness>
+
+extension BrightnessGrid {
+    static let empty = BrightnessGrid(cells: [:])
 }
 
 struct RenderedGrid: Equatable {
-    var grid: MainGrid
+    var grid: ColorGrid
     var brightness: CGFloat = 0; // negative to reduce brightness, positive to increase it
 
     static let empty = RenderedGrid(grid: .empty)

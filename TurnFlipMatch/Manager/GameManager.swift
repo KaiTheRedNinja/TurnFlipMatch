@@ -32,7 +32,7 @@ class GameManager {
     /// The main grid that renders on the screen
     var mainGrid: RenderedGrid
     /// The main grid that is actually used for comparisons
-    var referenceGrid: MainGrid
+    var referenceGrid: ColorGrid
     /// The current play state
     var playState: PlayState = .playing
 

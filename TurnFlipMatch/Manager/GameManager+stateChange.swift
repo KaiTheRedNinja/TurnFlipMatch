@@ -90,24 +90,24 @@ extension GameManager {
     }
 
     /// Returns the grid produced by two holds, or `nil` if they do not produce a valid grid (overlapping cells are different, or the holds themselves take up the same position)
-    func gridFromHolds(hold1: Hold, hold2: Hold) -> MainGrid? {
+    func gridFromHolds(hold1: Hold, hold2: Hold) -> ColorGrid? {
         // must not be on the same edge
         guard hold1.position.edge != hold2.position.edge else { return nil }
 
         // fill up the quadrants
-        var grid = MainGrid.empty
+        var grid = ColorGrid.empty
         for hold in [hold1, hold2] {
             let cw = hold.currentCwColor
             let acw = hold.currentAcwColor
             let (acwQuad, cwQuad) = hold.position.quadrants
 
             // check if there are any conflicts
-            if let existingCw = grid.colors[cwQuad], existingCw != cw { return nil }
-            if let existingAcw = grid.colors[acwQuad], existingAcw != acw { return nil }
+            if let existingCw = grid.cells[cwQuad], existingCw != cw { return nil }
+            if let existingAcw = grid.cells[acwQuad], existingAcw != acw { return nil }
 
             // update the grid
-            grid.colors[cwQuad] = cw
-            grid.colors[acwQuad] = acw
+            grid.cells[cwQuad] = cw
+            grid.cells[acwQuad] = acw
         }
         return grid
     }

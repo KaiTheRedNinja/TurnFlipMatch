@@ -25,6 +25,11 @@ enum CellColor: String, CaseIterable, Identifiable, Equatable {
     }
 }
 
+enum CellBrightness: String, CaseIterable, Equatable {
+    case high
+    case off
+}
+
 enum Quadrant: Int, CaseIterable, Equatable {
     case topRight = 1
     case topLeft = 2
