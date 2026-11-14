@@ -28,10 +28,10 @@ This arrangement (should?) give quite a lot of possible layouts.
   - [x] Win state detection
   - [x] Automatic new grid generation
   - [x] Points system
-- [ ] Interaction
+- [x] Interaction
   - [x] Animated interactive movement
   - [x] Haptics
-  - [ ] Gyroscope controls
+  - [x] ~~Gyroscope controls~~ tried and failed
 - [ ] Polish (not required for game to work)
   - [x] Victory animation
   - [ ] Skeomorphic UI

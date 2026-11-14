@@ -8,7 +8,7 @@
 import SwiftUI
 import CoreHaptics
 
-let startingTimeSec: CGFloat = 8.0
+let startingTimeSec: CGFloat = 10.0
 let endingTimeSec: CGFloat = 3.0
 let maxPhases: CGFloat = 10.0
 
