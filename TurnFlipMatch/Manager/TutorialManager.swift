@@ -158,7 +158,7 @@ class TutorialManager: GameManagerDelegate {
         gameManager.stateChangePlaying(gridOverride: grid)
 
         // update the instructions
-        instructions = "Tap on the left hold to flip it"
+        instructions = "In this game, you move the holds to match the pattern in the middle. Tap on the left hold to flip it!"
     }
 
     /// Generates a grid that can be solved by just rotating one hold.
@@ -174,7 +174,7 @@ class TutorialManager: GameManagerDelegate {
         gameManager.stateChangePlaying(gridOverride: grid)
 
         // update the instructions
-        instructions = "Drag the right hold to move it"
+        instructions = "Other than flipping, holds can also be moved. Drag the right hold to move it!"
     }
 
     /// Generates a grid that has to be solved by just rotating two holds.
@@ -192,7 +192,7 @@ class TutorialManager: GameManagerDelegate {
         gameManager.stateChangePlaying(gridOverride: grid)
 
         // update the instructions
-        instructions = "You can drag two holds at the same time"
+        instructions = "To save time, you can drag two holds at the same time"
     }
 
     /// Starts a game
@@ -201,7 +201,7 @@ class TutorialManager: GameManagerDelegate {
         // dont care what phase it is rn, just trigger play.
         gameManager.phase = 1
         gameManager.stateChangePlaying()
-        instructions = "You have a time limit, starting at 10s"
+        instructions = "You have a time limit, starting at \(Int(startingTimeSec))s. As you play, it will get shorter!"
     }
 
     /// Informs the user that they should be ready

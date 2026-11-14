@@ -57,6 +57,7 @@ struct ContentView: View {
                 .minimumScaleFactor(0.5)
                 .font(.body)
                 .italic()
+                .multilineTextAlignment(.center)
 
             Spacer()
                 .frame(minHeight: totalMaxWidth)
@@ -73,6 +74,8 @@ struct ContentView: View {
                     tutorial.nextPhase()
                 }
                 .buttonStyle(.borderedProminent)
+                .tint(.green)
+                .saturation(2.0)
                 .disabled(tutorial.tracker?.isComplete() == false)
             }
             // NOTE: there are 5 phases, from 0 to 4, so we add 1
