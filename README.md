@@ -23,15 +23,15 @@ This arrangement (should?) give quite a lot of possible layouts.
 - [x] Basic types
   - [x] Holds
   - [x] Main Grid
-- [ ] Game Manager
+- [x] Game Manager
   - [x] Random grid generation
   - [x] Win state detection
-  - [ ] Automatic new grid generation
-  - [ ] Points system
+  - [x] Automatic new grid generation
+  - [x] Points system
 - [ ] Interaction
-  - [ ] Animated interactive movement
-  - [ ] Haptics
+  - [x] Animated interactive movement
+  - [x] Haptics
   - [ ] Gyroscope controls
 - [ ] Polish (not required for game to work)
-  - [ ] Victory animation
+  - [x] Victory animation
   - [ ] Skeomorphic UI
