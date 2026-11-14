@@ -108,3 +108,35 @@ enum PlayState {
     /// The user failed to match the holds within the given time. Play a lose animation.
     case lost
 }
+
+protocol GameManagerDelegate: AnyObject {
+    /// Informs the delegate that a hold has been flipped
+    func holdDidFlip(flippedHold: HoldID)
+    /// Informs the delegate that a hold has changed angle, but not nescessarily that it has changed edge
+    func holdDidRotate(rotatedHold: HoldID)
+    /// Informs the delegate that a hold has moved to a new edge
+    func holdDidChangeEdge(changedHold: HoldID)
+    /// Informs the delegate that the `isHeld` state of a hold has changed
+    func holdDidChangeHeld(changedHold: HoldID)
+
+    /// Informs the delegate that the game has started
+    func userDidEnterPlaying()
+    /// Informs the delegate that the user has successfully matched a tile. This corresponds with entering the `celebration` play state.
+    func userDidEnterCelebration()
+    /// Informs the delegate that the user has failed to match a tile. This corresponds with entering the `lost` play state.
+    func userDidEnterLost()
+    /// Informs the delegate that the game has returned to idle state
+    func userDidEnterIdle()
+}
+
+/// Default implementations
+extension GameManagerDelegate {
+    func holdDidFlip(flippedHold: HoldID) {}
+    func holdDidRotate(rotatedHold: HoldID) {}
+    func holdDidChangeEdge(changedHold: HoldID) {}
+    func holdDidChangeHeld(changedHold: HoldID) {}
+    func userDidEnterPlaying() {}
+    func userDidEnterCelebration() {}
+    func userDidEnterLost() {}
+    func userDidEnterIdle() {}
+}

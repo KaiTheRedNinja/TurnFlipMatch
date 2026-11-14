@@ -35,3 +35,6 @@ This arrangement (should?) give quite a lot of possible layouts.
 - [ ] Polish (not required for game to work)
   - [x] Victory animation
   - [ ] Skeomorphic UI
+- [ ] Tutorial
+  - [ ] Rotating
+  - [ ] Flipping
