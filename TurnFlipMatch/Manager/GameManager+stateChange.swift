@@ -19,6 +19,7 @@ extension GameManager {
     func stateChangeIdle() {
         playState = .idle
         playAnimation(name: "Idle", task: animateIdleMainGrid)
+        delegate?.userDidEnterIdle()
     }
 
     /// Generates a random valid main grid
@@ -45,6 +46,7 @@ extension GameManager {
             playAnimation(name: "Playing", task: animatePlayingMainGrid)
             return
         }
+        delegate?.userDidEnterPlaying()
     }
 
     /// Changes the state to losing
@@ -54,6 +56,7 @@ extension GameManager {
         playState = .lost
         // play the lose animation
         playAnimation(name: "Lose", task: animateLostMainGrid)
+        delegate?.userDidEnterLost()
     }
 
     /// Changes the state to winning
@@ -63,6 +66,7 @@ extension GameManager {
         playState = .celebration
         // play the win animation
         playAnimation(name: "Win", task: animateWinMainGrid)
+        delegate?.userDidEnterCelebration()
     }
 
     /// Checks if the holds match the main grid. If it does, it is marked as a victory and the game is refreshed

@@ -14,6 +14,7 @@ extension GameManager {
     /// Informs the game manager of whether or not the hold is currently actually being held
     func markHold(_ id: HoldID, isHeld: Bool) {
         self[holdId: id].isHeld = isHeld
+        delegate?.holdDidChangeHeld(changedHold: id)
     }
 
     /// Informs the game manager of the intention to move the hold to the given angle. Returns the angle that the hold will be moved to.
@@ -52,12 +53,14 @@ extension GameManager {
 
         // move this hold
         self[holdId: id].angle = newAngle
+        delegate?.holdDidRotate(rotatedHold: id)
         let newEdge = EdgePosition.closest(toDegrees: newAngle.degrees)
         if newEdge != thisHold.position.edge {
             self[holdId: id].position.edge = newEdge
             // a hold was changed, trigger haptic and check for victory
             exitIdleState()
             playHaptic()
+            delegate?.holdDidChangeEdge(changedHold: id)
             checkForVictory()
         }
         return newAngle
@@ -97,6 +100,7 @@ extension GameManager {
             // a hold was changed, trigger haptic and check for victory
             exitIdleState()
             playHaptic()
+            delegate?.holdDidChangeEdge(changedHold: id)
             checkForVictory()
         }
         return newAngle
@@ -109,6 +113,7 @@ extension GameManager {
         self[holdId: id].position.flipped.toggle()
         exitIdleState()
         playHaptic()
+        delegate?.holdDidFlip(flippedHold: id)
         checkForVictory()
     }
 }

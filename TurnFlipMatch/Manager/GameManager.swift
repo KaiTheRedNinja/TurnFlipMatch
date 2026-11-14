@@ -45,6 +45,9 @@ class GameManager {
     /// The current phase. This is equal to `floor(points/10)+1`, and controls the speed of the game.
     var phase: Int = 1
 
+    /// The delegate
+    weak var delegate: (any GameManagerDelegate)?
+
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
     private(set) var animation: Task<Void, Never>?
 
