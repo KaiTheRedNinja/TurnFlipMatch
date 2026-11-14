@@ -5,7 +5,7 @@
 //  Created by Kai Quan Tay on 11/11/26.
 //
 
-import Foundation
+import SwiftUI
 
 struct QuadrantGrid<Cell: Equatable>: Equatable {
     var cells: [Quadrant: Cell]
@@ -33,12 +33,28 @@ extension ColorGrid {
 typealias BrightnessGrid = QuadrantGrid<CellBrightness>
 
 extension BrightnessGrid {
-    static let empty = BrightnessGrid(cells: [:])
+    static let allHigh = BrightnessGrid(all: .high)
+    static let allOff = BrightnessGrid(all: .off)
 }
 
 struct RenderedGrid: Equatable {
-    var grid: ColorGrid
-    var brightness: CGFloat = 0; // negative to reduce brightness, positive to increase it
+    var color: ColorGrid = .empty
+    var brightness: BrightnessGrid = .allHigh
 
-    static let empty = RenderedGrid(grid: .empty)
+    func uiColor(forQuad quadrant: Quadrant) -> Color {
+        color.cells[quadrant]?.color ?? .init(white: 0.2)
+    }
+
+    // negative = darker, 0 = unchanged, positive = brighter
+    func uiBrightness(forQuad quadrant: Quadrant) -> CGFloat {
+        // an empty cell has no brightness to change
+        guard color.cells[quadrant] != nil else { return 0 }
+        // default to off, which is -50% brightness.
+        switch brightness.cells[quadrant] {
+        case .high: return 0.0
+        case .off, nil: return -0.5
+        }
+    }
+
+    static let empty = RenderedGrid(color: .empty, brightness: .allHigh)
 }

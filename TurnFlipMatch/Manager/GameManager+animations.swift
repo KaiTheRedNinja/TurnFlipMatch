@@ -11,8 +11,8 @@ extension GameManager {
     /// Animates the main grid during play
     func animatePlayingMainGrid() async throws {
         let currentGrid = referenceGrid // make sure we're still operating on the same grid
-        mainGrid.grid = referenceGrid
-        mainGrid.brightness = 0
+        mainGrid.color = referenceGrid
+        mainGrid.brightness = .allHigh
 
         func wait(_ time: Duration) async throws {
             try await Task.sleep(for: time)
@@ -24,10 +24,10 @@ extension GameManager {
         // start blinking, PD of 50% at 2Hz for 3s (six cycles)
         for _ in 0..<6 {
             // off for 0.25s
-            mainGrid.brightness = -0.5
+            mainGrid.brightness = .allOff
             try await wait(.milliseconds(250))
             // on for 0.25s
-            mainGrid.brightness = 0
+            mainGrid.brightness = .allHigh
             try await wait(.milliseconds(250))
         }
         //        // the game has been lost, change state
@@ -38,7 +38,7 @@ extension GameManager {
     /// Changes the state to losing
     func animateLostMainGrid() async throws {
         // main grid becomes fully red for 0.5s
-        mainGrid = .init(grid: .init(all: .red))
+        mainGrid = .init(color: .init(all: .red))
 
         try await Task.sleep(for: .milliseconds(500))
         guard !Task.isCancelled else { throw CancellationError() }
@@ -53,26 +53,26 @@ extension GameManager {
             try await Task.sleep(for: time)
             guard !Task.isCancelled else { throw CancellationError() }
         }
-        mainGrid.brightness = 0
+        mainGrid.brightness = .allHigh
 
         // every 0.1s we mark another square green
-        mainGrid.grid.cells[.topLeft] = .green
+        mainGrid.color.cells[.topLeft] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.topRight] = .green
+        mainGrid.color.cells[.topRight] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.bottomRight] = .green
+        mainGrid.color.cells[.bottomRight] = .green
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.bottomLeft] = .green
+        mainGrid.color.cells[.bottomLeft] = .green
 
         // every 0.1s we wipe the screen, in the same order
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.topLeft] = nil
+        mainGrid.color.cells[.topLeft] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.topRight] = nil
+        mainGrid.color.cells[.topRight] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.bottomRight] = nil
+        mainGrid.color.cells[.bottomRight] = nil
         try await wait(.milliseconds(100))
-        mainGrid.grid.cells[.bottomLeft] = nil
+        mainGrid.color.cells[.bottomLeft] = nil
 
         // if the number of points means we're in a new phase, change it
         let newPhase = (points/5) + 1
@@ -94,14 +94,18 @@ extension GameManager {
         }
 
         // make all green
-        mainGrid = .init(grid: .init(all: .green))
+        mainGrid = .init(color: .init(all: .green))
 
-        for _ in 0..<phase {
+        // wait 0.5s
+        try await wait(.milliseconds(500))
+
+        // no more than 10 flashes, since that would be 5 whole seconds
+        for _ in 0..<min(10, phase) {
             // turn off
-            mainGrid.brightness = -0.5
+            mainGrid.brightness = .allOff
             try await wait(.milliseconds(250))
             // turn on
-            mainGrid.brightness = 0.0
+            mainGrid.brightness = .allHigh
             try await wait(.milliseconds(250))
         }
 

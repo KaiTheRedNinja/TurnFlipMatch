@@ -27,8 +27,8 @@ struct ContentView: View {
                         manager.checkForVictory()
                     }
             }
+            .shadow(radius: 10)
             .frame(width: mainGridWidth, height: mainGridWidth)
-            .border(Color.cyan)
             .coordinateSpace(.named("mainGrid"))
             .onAppear {
                 manager.stateChangePlaying()

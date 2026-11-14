@@ -13,27 +13,32 @@ struct MainGridView: View {
     var body: some View {
         VStack(spacing: cellSpacing) {
             HStack(spacing: cellSpacing) {
-                (grid.grid.cells[.topLeft]?.color ?? Color.gray.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .frame(width: cellWidth, height: cellWidth)
-                (grid.grid.cells[.topRight]?.color ?? Color.gray.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .frame(width: cellWidth, height: cellWidth)
+                ledCell(forQuad: .topLeft)
+                ledCell(forQuad: .topRight)
             }
             HStack(spacing: cellSpacing) {
-                (grid.grid.cells[.bottomLeft]?.color ?? Color.gray.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .frame(width: cellWidth, height: cellWidth)
-                (grid.grid.cells[.bottomRight]?.color ?? Color.gray.opacity(0.8))
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .frame(width: cellWidth, height: cellWidth)
+                ledCell(forQuad: .bottomLeft)
+                ledCell(forQuad: .bottomRight)
             }
         }
-        .brightness(grid.brightness)
         .padding(cellSpacing)
         .background {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.primary)
         }
+    }
+
+    func ledCell(forQuad quad: Quadrant) -> some View {
+        grid.uiColor(forQuad: quad)
+            .saturation(2.0)
+            .brightness(grid.uiBrightness(forQuad: quad))
+            .overlay {
+                grid.uiColor(forQuad: quad)
+                    .brightness(grid.uiBrightness(forQuad: quad) + 0.3)
+                    .frame(width: cellWidth/2, height: cellWidth/2)
+                    .blur(radius: cellWidth/4)
+            }
+            .clipShape(RoundedRectangle(cornerRadius: 10))
+            .frame(width: cellWidth, height: cellWidth)
     }
 }
