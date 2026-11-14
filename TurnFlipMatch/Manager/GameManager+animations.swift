@@ -74,7 +74,38 @@ extension GameManager {
         try await wait(.milliseconds(100))
         mainGrid.grid.colors[.bottomLeft] = nil
 
-        // TODO: determine if we want to auto-restart?
+        // if the number of points means we're in a new phase, change it
+        let newPhase = (points/5) + 1
+        if newPhase > phase {
+            // do a phase change before switching to playing
+            phase = newPhase
+            try await animatePhaseChangeMainGrid(phase: newPhase)
+        } else {
+            // same phase, change to playing
+            stateChangePlaying()
+        }
+    }
+
+    func animatePhaseChangeMainGrid(phase: Int) async throws {
+        // blink according to what the phase is now
+        func wait(_ time: Duration) async throws {
+            try await Task.sleep(for: time)
+            guard !Task.isCancelled else { throw CancellationError() }
+        }
+
+        // make all green
+        mainGrid = .init(grid: .init(color: .green))
+
+        for _ in 0..<phase {
+            // turn off
+            mainGrid.brightness = -0.5
+            try await wait(.milliseconds(250))
+            // turn on
+            mainGrid.brightness = 0.0
+            try await wait(.milliseconds(250))
+        }
+
+        // change to playing
         stateChangePlaying()
     }
 }

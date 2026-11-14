@@ -37,7 +37,9 @@ class GameManager {
     var playState: PlayState = .playing
 
     /// The current number of points
-    var points: Int = 0;
+    var points: Int = 0
+    /// The current phase. This is equal to `floor(points/5)+1`, and controls the speed of the game.
+    var phase: Int = 1
 
     /// The current animation task. This task is responsible for playing rush, celebration, and loss animations.
     var animation: Task<Void, Never>?
@@ -66,5 +68,7 @@ class GameManager {
 enum PlayState {
     case playing
     case celebration
+    // every 5 wins, the phase changes. Each phase change reduces the time by 10%.
+    case phaseChange
     case lost
 }
