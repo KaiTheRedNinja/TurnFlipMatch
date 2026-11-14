@@ -97,6 +97,7 @@ struct TutorialReadyTracker: TutorialTracker {
 
 @Observable
 class TutorialManager: GameManagerDelegate {
+    var isActive: Bool = false
     var phase: TutorialPhase = .flipping
     var tracker: (any TutorialTracker)?
     var instructions: String = ""
@@ -105,6 +106,7 @@ class TutorialManager: GameManagerDelegate {
 
     /// Starts a tutorial by attaching it to the game manager
     func start(gameManager: GameManager) {
+        isActive = true
         gameManager.delegate = self
         gameManager.phase = -100_000 // remove time limit
         self.gameManager = gameManager
@@ -113,6 +115,7 @@ class TutorialManager: GameManagerDelegate {
 
     /// Exits the tutorial
     func exit() {
+        isActive = false
         gameManager.delegate = nil
         gameManager.points = 0
         gameManager.phase = 1
