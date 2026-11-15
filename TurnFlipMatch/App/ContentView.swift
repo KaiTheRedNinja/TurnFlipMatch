@@ -103,6 +103,10 @@ struct ContentView: View {
             .font(.largeTitle)
             .monospacedDigit()
 
+        Text("High Score: \(manager.highScore)")
+            .font(.title2)
+            .monospacedDigit()
+
         if manager.playState == .idle {
             Text("Move a hold to start")
                 .font(.title)

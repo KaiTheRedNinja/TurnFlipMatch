@@ -42,6 +42,8 @@ class GameManager {
 
     /// The current number of points
     var points: Int = 0
+    /// The highest number of points ever
+    var highScore: Int = 0
     /// The current phase. This is equal to `floor(points/10)+1`, and controls the speed of the game.
     var phase: Int = 1
 
@@ -58,6 +60,7 @@ class GameManager {
         self.referenceGrid = .empty
         self.playState = .idle
         self.points = 0
+        self.highScore = UserDefaults.standard.integer(forKey: "high_score")
 
         // set up haptics
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
@@ -91,6 +94,12 @@ class GameManager {
     func stopAnimation() {
         animation?.cancel()
         animation = nil
+    }
+
+    func updateHighScore() {
+        guard points > highScore else { return }
+        highScore = points
+        UserDefaults.standard.set(highScore, forKey: "high_score")
     }
 }
 

@@ -71,6 +71,7 @@ extension GameManager {
     func stateChangeWin() {
         print("Game WON!!!")
         points += 1
+        updateHighScore()
         playState = .celebration
         // play the win animation
         playAnimation(name: "Win", task: animateWinMainGrid)
