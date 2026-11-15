@@ -40,6 +40,7 @@ extension BrightnessGrid {
 struct RenderedGrid: Equatable {
     var color: ColorGrid = .empty
     var brightness: BrightnessGrid = .allHigh
+    var backight: CellColor? = nil
 
     func uiColor(forQuad quadrant: Quadrant) -> Color {
         color.cells[quadrant]?.color ?? .init(white: 0.2)

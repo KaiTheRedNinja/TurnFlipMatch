@@ -35,13 +35,16 @@ struct ContentView: View {
             // actual game board
             ZStack {
                 HoldView(manager: manager, holdId: .one)
+                    .shadow(radius: 10)
                 HoldView(manager: manager, holdId: .two)
+                    .shadow(radius: 10)
                 MainGridView(grid: manager.mainGrid)
-                    .onTapGesture {
-                        manager.checkForVictory()
-                    }
+                    .compositingGroup()
+                    .shadow(
+                        color: manager.mainGrid.backight?.color ?? Color(.sRGBLinear, white: 0, opacity: 0.33),
+                        radius: manager.mainGrid.backight == nil ? 10 : 50
+                    )
             }
-            .shadow(radius: 10)
             .frame(width: mainGridWidth, height: mainGridWidth)
             .coordinateSpace(.named("mainGrid"))
         }

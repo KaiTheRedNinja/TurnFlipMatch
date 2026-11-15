@@ -18,6 +18,7 @@ extension GameManager {
         // literally just rotate the four colours around the screen forever
         var offset = 0
         mainGrid.brightness = .allHigh
+        mainGrid.backight = nil
         while true {
             offset += 1
 
@@ -37,6 +38,7 @@ extension GameManager {
         let currentGrid = referenceGrid // make sure we're still operating on the same grid
         mainGrid.color = referenceGrid
         mainGrid.brightness = .allHigh
+        mainGrid.backight = nil
 
         // NOTE: this differs from `wait` in that it also checks that the grid is the same
         func waitPlaying(_ time: Duration) async throws {
@@ -56,9 +58,11 @@ extension GameManager {
         for _ in 0..<4 {
             // off for 0.25s
             mainGrid.brightness = .allOff
+            playHaptic()
             try await waitPlaying(.milliseconds(250))
             // on for 0.25s
             mainGrid.brightness = .allHigh
+            playHaptic()
             try await waitPlaying(.milliseconds(250))
         }
         // the game has been lost, change state
@@ -68,11 +72,13 @@ extension GameManager {
 
     /// Changes the state to losing
     func animateLostMainGrid() async throws {
-        // main grid becomes fully red for 0.5s
+        // main grid becomes fully red for 2s, plays two haptics
+        playHaptic()
         mainGrid = .init(color: .init(all: .red))
-
-        try await Task.sleep(for: .milliseconds(1000))
-        guard !Task.isCancelled else { throw CancellationError() }
+        mainGrid.backight = .red
+        try await wait(.milliseconds(200))
+        playHaptic()
+        try await wait(.milliseconds(1800))
 
         stateChangeIdle()
     }
@@ -80,14 +86,19 @@ extension GameManager {
     /// Changes the state to winning
     func animateWinMainGrid() async throws {
         mainGrid.brightness = .allHigh
+        mainGrid.backight = .green
 
         // every 0.1s we mark another square green
+        playHaptic()
         mainGrid.color.cells[.topLeft] = .green
         try await wait(.milliseconds(100))
+        playHaptic()
         mainGrid.color.cells[.topRight] = .green
         try await wait(.milliseconds(100))
+        playHaptic()
         mainGrid.color.cells[.bottomRight] = .green
         try await wait(.milliseconds(100))
+        playHaptic()
         mainGrid.color.cells[.bottomLeft] = .green
 
         // every 0.1s we wipe the screen, in the same order
@@ -117,6 +128,7 @@ extension GameManager {
 
         // make all green
         mainGrid = .init(color: .init(all: .green))
+        mainGrid.backight = .green
 
         // wait 0.5s
         try await wait(.milliseconds(500))
