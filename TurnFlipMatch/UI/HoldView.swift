@@ -22,6 +22,14 @@ struct HoldView: View {
         let hold = manager[holdId: holdId]
 
         ZStack {
+            // connection to main body
+            Capsule()
+                .fill(Color.black)
+                .padding(.leading, -handleCellWidth)
+                .frame(width: handleCellWidth + 20, height: handleCellWidth * 0.5)
+                .padding(.trailing, 10)
+
+            // the actual hold
             sideColors(hold: hold, isSide1: !hold.position.flipped)
                 .rotation3DEffect(flipAngle, axis: (x: 1, y: 0, z: 0))
                 .scaleEffect(y: hold.position.flipped ? -1 : 1)

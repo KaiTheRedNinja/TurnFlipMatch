@@ -23,13 +23,14 @@ struct MainGridView: View {
         }
         .padding(cellSpacing)
         .background {
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: cellSpacing + 10)
                 .fill(Color.primary)
         }
     }
 
     func ledCell(forQuad quad: Quadrant) -> some View {
-        grid.uiColor(forQuad: quad)
+        RoundedRectangle(cornerRadius: 10)
+            .fill(grid.uiColor(forQuad: quad))
             .saturation(2.0)
             .brightness(grid.uiBrightness(forQuad: quad))
             .overlay {
