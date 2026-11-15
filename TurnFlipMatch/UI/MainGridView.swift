@@ -31,7 +31,7 @@ struct MainGridView: View {
     func ledCell(forQuad quad: Quadrant) -> some View {
         RoundedRectangle(cornerRadius: 10)
             .fill(grid.uiColor(forQuad: quad))
-            .saturation(2.0)
+            .saturation(1.5)
             .brightness(grid.uiBrightness(forQuad: quad))
             .overlay {
                 grid.uiColor(forQuad: quad)
@@ -41,5 +41,6 @@ struct MainGridView: View {
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .frame(width: cellWidth, height: cellWidth)
+            .shadow(color: grid.uiColor(forQuad: quad), radius: 5)
     }
 }

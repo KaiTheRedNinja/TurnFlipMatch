@@ -123,18 +123,18 @@ struct HoldView: View {
     func sideColors(hold: Hold, isSide1: Bool) -> some View {
         VStack(spacing: cellSpacing) {
             hold.colorFor(side1: !isSide1, isClockwise: true).color
-                .frame(width: handleCellWidth * 0.8, height: cellSpacing)
+                .frame(width: handleCellWidth * 0.8, height: cellSpacing/2)
                 .clipShape(UnevenRoundedRectangle(cornerRadii: .init(bottomLeading: 10, bottomTrailing: 10)))
 
-            hold.colorFor(side1: isSide1, isClockwise: false).color
+            RoundedRectangle(cornerRadius: 10)
+                .fill(hold.colorFor(side1: isSide1, isClockwise: false).color.shadow(.inner(radius: 5, y: 0)))
                 .frame(width: handleCellWidth, height: cellWidth)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
-            hold.colorFor(side1: isSide1, isClockwise: true).color
+            RoundedRectangle(cornerRadius: 10)
+                .fill(hold.colorFor(side1: isSide1, isClockwise: true).color.shadow(.inner(radius: 5, y: 0)))
                 .frame(width: handleCellWidth, height: cellWidth)
-                .clipShape(RoundedRectangle(cornerRadius: 10))
 
             hold.colorFor(side1: !isSide1, isClockwise: false).color
-                .frame(width: handleCellWidth * 0.8, height: cellSpacing)
+                .frame(width: handleCellWidth * 0.8, height: cellSpacing/2)
                 .clipShape(UnevenRoundedRectangle(cornerRadii: .init(topLeading: 10, topTrailing: 10)))
         }
         .padding(.horizontal, 10)
