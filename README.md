@@ -39,9 +39,9 @@ This arrangement (should?) give quite a lot of possible layouts.
   - [x] Animated interactive movement
   - [x] Haptics
   - [x] ~~Gyroscope controls~~ tried and failed
-- [ ] Polish (not required for game to work)
+- [x] Polish (not required for game to work)
   - [x] Victory animation
-  - [ ] Skeomorphic UI
-- [ ] Tutorial
-  - [ ] Rotating
-  - [ ] Flipping
+  - [x] Skeomorphic UI
+- [x] Tutorial
+  - [x] Rotating
+  - [x] Flipping
