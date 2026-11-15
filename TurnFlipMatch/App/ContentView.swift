@@ -12,6 +12,7 @@ let totalMaxWidth = mainGridWidth + 2 * (cellSpacing + cellWidth)
 struct ContentView: View {
     @State var manager = GameManager()
     @State var tutorial = TutorialManager()
+    @State var rotation = RotationManager()
 
     var body: some View {
         ZStack(alignment: .center) {
@@ -47,6 +48,15 @@ struct ContentView: View {
             }
             .frame(width: mainGridWidth, height: mainGridWidth)
             .coordinateSpace(.named("mainGrid"))
+            .rotation3DEffect(.degrees(3 * sigmoid(rotation.currentMotion?.attitude.pitch ?? 0)), axis: (x: 1, y: 0, z: 0))
+            .rotation3DEffect(.degrees(3 * sigmoid(rotation.currentMotion?.attitude.roll ?? 0)), axis: (x: 0, y: -1, z: 0))
+            .animation(.interactiveSpring, value: rotation.currentMotion?.attitude)
+        }
+        .onAppear {
+            rotation.startDeviceMotion()
+        }
+        .onDisappear {
+            rotation.stopDeviceMotion()
         }
     }
 
@@ -108,6 +118,11 @@ struct ContentView: View {
             }
             .buttonStyle(.borderedProminent)
         }
+    }
+
+    /// Sigmoid between -1 and 1
+    func sigmoid(_ value: CGFloat) -> CGFloat {
+        return -1.0 + 2.0 / (1 + exp(-2 * value))
     }
 }
 
