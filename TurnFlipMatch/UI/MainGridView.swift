@@ -10,6 +10,8 @@ import SwiftUI
 struct MainGridView: View {
     var grid: RenderedGrid
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         VStack(spacing: cellSpacing) {
             HStack(spacing: cellSpacing) {
@@ -24,7 +26,8 @@ struct MainGridView: View {
         .padding(cellSpacing)
         .background {
             RoundedRectangle(cornerRadius: cellSpacing + 10)
-                .fill(Color.primary)
+                .fill(.black)
+                .stroke(.white, lineWidth: colorScheme == .dark ? 2 : 0)
         }
     }
 

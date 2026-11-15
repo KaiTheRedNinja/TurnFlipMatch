@@ -20,6 +20,8 @@ struct HoldView: View {
     /// `0` for not flipped, `pi` for flipped
     @State var flipAngle: Angle = .zero
 
+    @Environment(\.colorScheme) var colorScheme
+
     var body: some View {
         let centerPoint = CGPoint(x: mainGridWidth/2, y: mainGridWidth/2)
         let offsetDist = cellWidth + cellSpacing + gridHandleSpacing + handleCellWidth/2 + 10
@@ -28,7 +30,8 @@ struct HoldView: View {
         ZStack {
             // connection to main body
             Capsule()
-                .fill(Color.black)
+                .fill(.black)
+                .stroke(.white, lineWidth: colorScheme == .dark ? 2 : 0)
                 .padding(.leading, -handleCellWidth * 1.5)
                 .frame(width: handleCellWidth + 20, height: handleCellWidth * 0.5)
                 .padding(.trailing, 10)
@@ -140,7 +143,8 @@ struct HoldView: View {
         .padding(.horizontal, 10)
         .background {
             RoundedRectangle(cornerRadius: 10)
-                .fill(Color.primary)
+                .fill(.black)
+                .stroke(.white, lineWidth: colorScheme == .dark ? 2 : 0)
         }
     }
 
