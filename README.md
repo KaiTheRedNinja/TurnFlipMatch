@@ -1,7 +1,14 @@
 # TurnFlipMatch
 
+## How to Play
+1. Download TestFlight from the App Store
+2. Download TurnFlipMatch from this link: [link here once uploaded]
+3. Launch the app and play the tutorial!
+
 ## What is this game?
 Inspired by a kid's toy I saw at my cousin's place. The game has a 2x2 grid of LEDs in the middle that flash with colours, and two handles that can rotate around the center. The user has to move and flip the handles (which have two colours on each side) to match the pattern in the center.
+
+My sister and I found the physical toy very addictive to play with, and I wanted to try and capture the same feeling but with a portable (and less conspicuous) app. This was mostly an exercise in working with gestures and rotation - since the holds only rotate horizontally, I have to do a lot of trigonometry to figure out what the gesture movements correspond to in radial coordinates.
 
 ## Grid Colours
 The four possible colours are:
