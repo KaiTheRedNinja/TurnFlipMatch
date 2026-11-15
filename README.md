@@ -2,7 +2,7 @@
 
 ## How to Play
 1. Download TestFlight from the App Store
-2. Download TurnFlipMatch from this link: [link here once uploaded]
+2. Download TurnFlipMatch [here](https://testflight.apple.com/join/fT48EBJt)
 3. Launch the app and play the tutorial!
 
 ## What is this game?
