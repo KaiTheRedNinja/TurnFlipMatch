@@ -136,9 +136,11 @@ extension GameManager {
         // no more than 10 flashes, since that would be 5 whole seconds
         for _ in 0..<min(10, phase) {
             // turn off
+            playHaptic()
             mainGrid.brightness = .allOff
             try await wait(.milliseconds(250))
             // turn on
+            playHaptic()
             mainGrid.brightness = .allHigh
             try await wait(.milliseconds(250))
         }

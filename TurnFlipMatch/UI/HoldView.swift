@@ -11,6 +11,10 @@ struct HoldView: View {
     @State var manager: GameManager
     var holdId: HoldID
 
+    /// The additional displacement during the gesture
+    @State var excessLength: CGFloat = 0
+
+    /// The angle that the hold started at during the gesture
     @State var storedAngle: Angle = .zero
 
     /// `0` for not flipped, `pi` for flipped
@@ -25,7 +29,7 @@ struct HoldView: View {
             // connection to main body
             Capsule()
                 .fill(Color.black)
-                .padding(.leading, -handleCellWidth)
+                .padding(.leading, -handleCellWidth * 1.5)
                 .frame(width: handleCellWidth + 20, height: handleCellWidth * 0.5)
                 .padding(.trailing, 10)
 
@@ -43,9 +47,7 @@ struct HoldView: View {
         // equation for a square with side lengths 2r:
         // distance = l / cos((theta-pi/4 mod pi/2) - pi/4)
         .offset(
-            x: offsetDist / cos(
-                (hold.angle.radians + .pi/4).posRemainder(dividingBy: .pi/2) - .pi/4
-            )
+            x: naturalOffset(offsetDist: offsetDist, angle: hold.angle) + excessLength
         )
         .rotationEffect(-hold.angle)
         .onAppear {
@@ -66,20 +68,30 @@ struct HoldView: View {
                     let currentPolar = Polar(point: value.location.vflip(), center: centerPoint.vflip())
                     let difference = currentPolar.angle - startPolar.angle
 
+                    // determine the new angle
+                    let newAngle = (storedAngle + difference).nearestEquivalent(to: hold.angle)
+
+                    // determine the excess length using sigmoid
+                    let excessRaw = currentPolar.magnitude - offsetDist
+                    let newExcess: CGFloat = 15 / (1 + exp(-0.2 * excessRaw))
+
                     withAnimation(.interactiveSpring) {
-                        _ = manager.rotateHold(holdId, moveToAngle: (storedAngle + difference).nearestEquivalent(to: hold.angle))
+                        _ = manager.rotateHold(holdId, moveToAngle: newAngle)
+                        excessLength = newExcess
                     }
                 }
                 .onEnded { value in
+                    withAnimation(.interactiveSpring) {
+                        excessLength = 0
+                    }
                     defer { manager.markHold(holdId, isHeld: false) }
 
                     guard value.translation.magnitude >= 10 else {
                         // flip and align
                         manager.flipHold(holdId)
                         let newEdge = EdgePosition.closest(toDegrees: hold.angle.degrees)
-                        let newAngle = Angle.degrees(newEdge.degrees).nearestEquivalent(to: hold.angle)
                         withAnimation(.interactiveSpring) {
-                            storedAngle = manager.rotateHold(holdId, moveToAngle: newAngle)
+                            storedAngle = manager.moveHold(holdId, moveToEdge: newEdge)
                         }
                         return
                     }
@@ -130,5 +142,11 @@ struct HoldView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.primary)
         }
+    }
+
+    func naturalOffset(offsetDist: CGFloat, angle: Angle) -> CGFloat {
+        offsetDist / cos(
+            (angle.radians + .pi/4).posRemainder(dividingBy: .pi/2) - .pi/4
+        )
     }
 }
