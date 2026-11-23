@@ -1,5 +1,7 @@
 # TurnFlipMatch
 
+<img width="603" height="1311" alt="Example" src="https://github.com/user-attachments/assets/69494af5-3633-4178-aa6b-a863c9e9d96e" />
+
 ## How to Play
 1. Download TestFlight from the App Store
 2. Download TurnFlipMatch [here](https://testflight.apple.com/join/fT48EBJt)
